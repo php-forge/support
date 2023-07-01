@@ -26,10 +26,10 @@ composer require php-forge/support
 
 [![build](https://github.com/php-forge/support/actions/workflows/build.yml/badge.svg)](https://github.com/php-forge/support/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/php-forge/support/branch/main/graph/badge.svg?token=CEBVCYZNQK)](https://codecov.io/gh/php-forge/support)
-[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii-tools%2Fsupport%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fphp-forge%2Fsupport%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main)
 [![static analysis](https://github.com/php-forge/support/actions/workflows/static.yml/badge.svg)](https://github.com/php-forge/support/actions/workflows/static.yml)
 [![type-coverage](https://shepherd.dev/github/php-forge/support/coverage.svg)](https://shepherd.dev/github/yiii-tools/support)
-[![StyleCI](https://github.styleci.io/repos/584864695/shield?branch=main)](https://github.styleci.io/repos/584864695?branch=main)
+[![StyleCI](https://github.styleci.io/repos/661073468/shield?branch=main)](https://github.styleci.io/repos/661073468?branch=main)
 
 ## License
 
