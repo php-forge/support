@@ -21,6 +21,3 @@ phpunit.phar
 
 # windows thumbnail cache
 Thumbs.db
-
-# package-lock.json
-package-lock.json
