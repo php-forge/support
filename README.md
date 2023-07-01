@@ -31,10 +31,10 @@ composer require php-forge/support
 [![type-coverage](https://shepherd.dev/github/php-forge/support/coverage.svg)](https://shepherd.dev/github/php-forge/support)
 [![StyleCI](https://github.styleci.io/repos/661073468/shield?branch=main)](https://github.styleci.io/repos/661073468?branch=main)
 
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
 ## Our social networks
 
 [![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/Terabytesoftw)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
