@@ -1,7 +1,7 @@
 {
     "name": "php-forge/support",
     "type": "library",
-    "description": "Support library tests for Yii3",
+    "description": "Support library tests for PHP",
     "keywords": [
         "php-forge",
         "php",
