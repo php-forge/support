@@ -15,13 +15,7 @@ final class AssertTest extends TestCase
 {
     public function testEqualsWithoutLE(): void
     {
-        Assert::equalsWithoutLE(
-            <<<Text
-            Foo
-            Bar
-            Text,
-            "Foo\nBar"
-        );
+        Assert::equalsWithoutLE('foo' . "\r\n" . 'bar', 'foo' . "\r\n" . 'bar');
     }
 
     public function testInaccessibleProperty(): void
