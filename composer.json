@@ -3,14 +3,13 @@
     "type": "library",
     "description": "Support library tests for PHP",
     "keywords": [
-        "php-forge",
         "php",
+        "php-forge",
         "support",
+        "testing",
         "tests"
     ],
     "license": "MIT",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^8.1",
         "phpunit/phpunit": "^10.2"
