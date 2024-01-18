@@ -6,30 +6,159 @@
     <br>
 </p>
 
-## Requirements
+<p align="center">
+    <a href="https://github.com/php-forge/support/actions/workflows/build.yml" target="_blank">
+        <img src="https://github.com/php-forge/support/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
+    </a>
+    <a href="https://codecov.io/gh/php-forge/support" target="_blank">
+        <img src="https://codecov.io/gh/php-forge/support/branch/main/graph/badge.svg?token=MF0XUGVLYC" alt="Codecov">
+    </a>
+    <a href="https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main" target="_blank">
+        <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Fasset-bootstrap5%2Fmain" alt="Infection">
+    </a>
+    <a href="https://github.com/php-forge/support/actions/workflows/static.yml" target="_blank">
+        <img src="https://github.com/php-forge/support/actions/workflows/static.yml/badge.svg" alt="Psalm">
+    </a>
+    <a href="https://shepherd.dev/github/php-forge/support" target="_blank">
+        <img src="https://shepherd.dev/github/php-forge/support/coverage.svg" alt="Psalm Coverage">
+    </a>
+    <a href="https://github.styleci.io/repos/661073468?branch=main" target="_blank">
+        <img src="https://github.styleci.io/repos/661073468/shield?branch=main" alt="Style ci">
+    </a>           
+</p>
 
-The minimun version of `PHP` required by this package is `PHP 8.1`.
+## Installation
 
-For install this package, you need [composer](https://getcomposer.org/).
+The preferred way to install this extension is through [composer](https://getcomposer.org/download/).
 
-## Install
+Either run
 
 ```shell
-composer require php-forge/support
+composer require --prefer-dist php-forge/support
 ```
+
+or add
+
+```json
+"php-forge/support": "^0.1"
+```
+
+to the require-dev section of your `composer.json` file. 
+
+## Usage
+
+### Equals without line ending
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace PHPForge\Support\Tests;
+
+use PHPForge\Support\Assert;
+
+Assert::equalsWithoutLE(
+    <<<Text
+    Foo
+    Bar
+    Text,
+    "Foo\nBar"
+);
+```
+
+### Inaccessible property
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace PHPForge\Support\Tests;
+
+use PHPForge\Support\Assert;
+
+$object = new class () {
+    private string $foo = 'bar';
+};
+
+$this->assertSame('bar', Assert::inaccessibleProperty($object, 'foo'));
+```
+
+### Invoke method
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace PHPForge\Support\Tests;
+
+use PHPForge\Support\Assert;
+
+$object = new class () {
+    protected function foo(): string
+    {
+        return 'foo';
+    }
+};
+
+$this->assertSame('foo', Assert::invokeMethod($object, 'foo'));
+```
+
+### Set inaccessible property
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace PHPForge\Support\Tests;
+
+use PHPForge\Support\Assert;
+
+$object = new class () {
+    private string $foo = 'bar';
+};
+
+Assert::setInaccessibleProperty($object, 'foo', 'baz');
+
+$this->assertSame('baz', Assert::inaccessibleProperty($object, 'foo'));
+```
+
+### Remove files from directory
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace PHPForge\Support\Tests;
+
+use PHPForge\Support\Assert;
+
+$dir = __DIR__ . '/runtime';
+
+mkdir($dir);
+mkdir($dir . '/subdir');
+touch($dir . '/test.txt');
+touch($dir . '/subdir/test.txt');
+
+Assert::removeFilesFromDirectory($dir);
+
+$this->assertFileDoesNotExist($dir . '/test.txt');
+
+rmdir(__DIR__ . '/runtime');
+```
+
+## Support versions
+
+[![PHP81](https://img.shields.io/badge/PHP-%3E%3D8.1-787CB5)](https://www.php.net/releases/8.1/en.php)
+[![Yii30](https://img.shields.io/badge/Yii%20version-3.0-blue)](https://yiiframework.com)
 
 ## Testing
 
 [Check the documentation testing](/docs/testing.md) to learn about testing.
-
-## CI status
-
-[![build](https://github.com/php-forge/support/actions/workflows/build.yml/badge.svg)](https://github.com/php-forge/support/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/php-forge/support/branch/main/graph/badge.svg?token=CEBVCYZNQK)](https://codecov.io/gh/php-forge/support)
-[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fphp-forge%2Fsupport%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main)
-[![static analysis](https://github.com/php-forge/support/actions/workflows/static.yml/badge.svg)](https://github.com/php-forge/support/actions/workflows/static.yml)
-[![type-coverage](https://shepherd.dev/github/php-forge/support/coverage.svg)](https://shepherd.dev/github/php-forge/support)
-[![StyleCI](https://github.styleci.io/repos/661073468/shield?branch=main)](https://github.styleci.io/repos/661073468?branch=main)
 
 ## Our social networks
 
@@ -37,4 +166,4 @@ composer require php-forge/support
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License. Please see [License File](LICENSE.md) for more information.
