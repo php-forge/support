@@ -73,21 +73,20 @@ composer update
 
 ## Basic Usage
 
-### Using TestSupport trait
+### Accessing private properties
 
 ```php
 <?php
-
 declare(strict_types=1);
 
 use PHPForge\Support\TestSupport;
 use PHPUnit\Framework\TestCase;
 
-final class MyTest extends TestCase
+final class AccessPrivatePropertyTest extends TestCase
 {
     use TestSupport;
 
-    public function testInaccessibleProperty()
+    public function testInaccesibleProperty():void
     {
         $object = new class () {
             private string $secretValue = 'hidden';
@@ -95,93 +94,116 @@ final class MyTest extends TestCase
 
         $value = self::inaccessibleProperty($object, 'secretValue');
 
-        self::assertSame('hidden', $value);
+        self::assertSame('hidden', $value, "Should access the private property and return its value.");
     }
 }
-```
-
-### Accessing private properties
-
-```php
-<?php
-
-declare(strict_types=1);
-
-$object = new class () {
-    private string $secretValue = 'hidden';
-};
-
-// access private properties for testing
-$value = self::inaccessibleProperty($object, 'secretValue');
-
-self::assertSame('hidden', $value);
-```
-
-### Equals without line ending
-
-```php
-<?php
-
-declare(strict_types=1);
-
-// normalize line endings for consistent comparisons
-self::assertSame(
-    self::normalizeLineEndings("Foo\r\nBar"),
-    self::normalizeLineEndings("Foo\nBar"),
-    "Should match regardless of line ending style"
-);
 ```
 
 ### Invoking protected methods
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-$object = new class () {
-    protected function calculate(int $a, int $b): int
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
+
+final class InvokeProtectedMethodTest extends TestCase
+{
+    use TestSupport;
+
+    public function testInvokeMethod(): void
     {
-        return $a + $b;
+        $object = new class () {
+            protected function calculate(int $a, int $b): int
+            {
+                return $a + $b;
+            }
+        };
+
+        $result = self::invokeMethod($object, 'calculate', [5, 3]);
+
+        self::assertSame(8, $result, "Should invoke the protected method and return the correct sum.");
     }
-};
+}
+```
 
-// test protected method behavior
-$result = self::invokeMethod($object, 'calculate', [5, 3]);
+### Normalize line endings
 
-self::assertSame(8, $result);
+```php
+<?php
+declare(strict_types=1);
+
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
+
+final class NormalizeLineEndingsTest extends TestCase
+{
+    use TestSupport;
+
+    public function testNormalizedComparison(): void
+    {
+        self::assertSame(
+            self::normalizeLineEndings("Foo\r\nBar"),
+            self::normalizeLineEndings("Foo\nBar"),
+            "Should match regardless of line ending style",
+        );
+    }
+}
 ```
 
 ### Remove files from directory
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-$testDir = dirname(__DIR__) . '/runtime';
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
 
-// clean up test artifacts (preserves '.gitignore' and '.gitkeep')
-self::removeFilesFromDirectory($testDir);
+final class RemoveFilesFromDirectoryTest extends TestCase
+{
+    use TestSupport;
+
+    public function testCleanup(): void
+    {
+        $testDir = dirname(__DIR__) . '/runtime';
+        // clean up test artifacts (preserves '.gitignore' and '.gitkeep')
+
+        self::removeFilesFromDirectory($testDir);
+
+        self::assertTrue(true, "Should remove all files in the test directory while preserving Git-tracked files.");
+    }
+}
 ```
 
 ### Set inaccessible property
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-$object = new class () {
-    private string $config = 'default';
-};
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
 
-// set private property for testing scenarios
-self::setInaccessibleProperty($object, 'config', 'test-mode');
+final class SetInaccessiblePropertyTest extends TestCase
+{
+    use TestSupport;
 
-$newValue = self::inaccessibleProperty($object, 'config');
+    public function testSetProperty()
+    {
+        $object = new class () {
+            private string $config = 'default';
+        };
 
-self::assertSame('test-mode', $newValue);
+        // set private property for testing scenarios
+        self::setInaccessibleProperty($object, 'config', 'test-mode');
+
+        $newValue = self::inaccessibleProperty($object, 'config');
+
+        self::assertSame('test-mode',  $newValue, "Should set the inaccessible property to 'test-mode'.");
+    }
+}
 ```
 
 ## Documentation
