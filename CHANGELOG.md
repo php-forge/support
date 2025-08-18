@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## 0.2.1 Under development
+
 ## 0.2.0 August 18, 2025
 
 - Bug #11: Refactor project structure and update dependencies (@terabytesoftw)
