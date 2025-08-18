@@ -27,143 +27,169 @@
     </a>           
 </p>
 
-## Installation
+## Features
 
-The preferred way to install this extension is through [composer](https://getcomposer.org/download/).
+✅ **Advanced Reflection Utilities**
+- Access and modify private/protected properties via reflection.
+- Invoke inaccessible methods for comprehensive testing coverage.
 
-Either run
+✅ **Cross-Platform String Assertions**
+- Eliminate false negatives from Windows/Unix line ending differences.
+- Normalize line endings for consistent string comparisons across platforms.
 
-```shell
+✅ **File System Test Management**
+- Recursive file and directory cleanup for isolated test environments.
+- Safe removal operations preserving Git tracking files.
+
+## Quick start
+
+### System requirements
+
+- [`PHP`](https://www.php.net/downloads) 8.1 or higher.
+- [`Composer`](https://getcomposer.org/download/) for dependency management.
+- [`PHPUnit`](https://phpunit.de/) for testing framework integration.
+
+### Installation
+
+#### Method 1: Using [Composer](https://getcomposer.org/download/) (recommended)
+
+Install the extension.
+
+```bash
 composer require --prefer-dist php-forge/support
 ```
 
-or add
+#### Method 2: Manual installation
+
+Add to your `composer.json`.
 
 ```json
-"php-forge/support": "^0.1"
+{
+    "require-dev": {
+        "php-forge/support": "^0.1"
+    }
+}
 ```
 
-to the require-dev section of your `composer.json` file. 
+Then run.
 
-## Usage
+```bash
+composer update
+```
 
-### Equals without line ending
+## Basic Usage
+
+### Cross-platform string equality
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace PHPForge\Support\Tests;
-
 use PHPForge\Support\Assert;
 
+// Normalize line endings for consistent comparisons
 Assert::equalsWithoutLE(
-    <<<Text
-    Foo
-    Bar
-    Text,
-    "Foo\nBar"
+    "Foo\r\nBar",
+    "Foo\nBar",
+    "Should match regardless of line ending style"
 );
 ```
 
-### Inaccessible property
+### Accessing private properties
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace PHPForge\Support\Tests;
-
 use PHPForge\Support\Assert;
 
 $object = new class () {
-    private string $foo = 'bar';
+    private string $secretValue = 'hidden';
 };
 
-$this->assertSame('bar', Assert::inaccessibleProperty($object, 'foo'));
+// Access private properties for testing
+$value = Assert::inaccessibleProperty($object, 'secretValue');
+$this->assertSame('hidden', $value);
 ```
 
-### Invoke method
+### Invoking protected methods
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace PHPForge\Support\Tests;
-
 use PHPForge\Support\Assert;
 
 $object = new class () {
-    protected function foo(): string
+    protected function calculate(int $a, int $b): int
     {
-        return 'foo';
+        return $a + $b;
     }
 };
 
-$this->assertSame('foo', Assert::invokeMethod($object, 'foo'));
+// Test protected method behavior
+$result = Assert::invokeMethod($object, 'calculate', [5, 3]);
+$this->assertSame(8, $result);
 ```
 
-### Set inaccessible property
+### Modifying inaccessible properties
 
 ```php
 <?php
 
 declare(strict_types=1);
-
-namespace PHPForge\Support\Tests;
 
 use PHPForge\Support\Assert;
 
 $object = new class () {
-    private string $foo = 'bar';
+    private string $config = 'default';
 };
 
-Assert::setInaccessibleProperty($object, 'foo', 'baz');
+// Set private property for testing scenarios
+Assert::setInaccessibleProperty($object, 'config', 'test-mode');
 
-$this->assertSame('baz', Assert::inaccessibleProperty($object, 'foo'));
+$newValue = Assert::inaccessibleProperty($object, 'config');
+$this->assertSame('test-mode', $newValue);
 ```
 
-### Remove files from directory
+### Test environment cleanup
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace PHPForge\Support\Tests;
-
 use PHPForge\Support\Assert;
 
-$dir = __DIR__ . '/runtime';
+$testDir = __DIR__ . '/runtime';
 
-mkdir($dir);
-mkdir($dir . '/subdir');
-touch($dir . '/test.txt');
-touch($dir . '/subdir/test.txt');
+// Create test files and directories
+mkdir($testDir . '/subdir', 0755, true);
+touch($testDir . '/test.txt');
+touch($testDir . '/subdir/nested.txt');
 
-Assert::removeFilesFromDirectory($dir);
+// Clean up test artifacts (preserves .gitignore and .gitkeep)
+Assert::removeFilesFromDirectory($testDir);
 
-$this->assertFileDoesNotExist($dir . '/test.txt');
-
-rmdir(__DIR__ . '/runtime');
+$this->assertFileDoesNotExist($testDir . '/test.txt');
+$this->assertDirectoryDoesNotExist($testDir . '/subdir');
 ```
 
-## Support versions
+## Documentation
 
-[![PHP81](https://img.shields.io/badge/PHP-%3E%3D8.1-787CB5)](https://www.php.net/releases/8.1/en.php)
-[![Yii30](https://img.shields.io/badge/Yii%20version-3.0-blue)](https://yiiframework.com)
+For comprehensive testing guidance, see:
 
-## Testing
-
-[Check the documentation testing](/docs/testing.md) to learn about testing.
+- 🧪 [Testing Guide](docs/testing.md)
 
 ## Our social networks
 
-[![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/Terabytesoftw)
+[![X](https://img.shields.io/badge/follow-@terabytesoftw-1DA1F2?logo=x&logoColor=1DA1F2&labelColor=555555&style=flat)](https://x.com/Terabytesoftw)
 
 ## License
+
+[![License](https://img.shields.io/github/license/php-forge/support?cacheSeconds=0)](LICENSE.md)
 
 The MIT License. Please see [License File](LICENSE.md) for more information.

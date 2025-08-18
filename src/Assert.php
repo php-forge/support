@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace PHPForge\Support;
 
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionObject;
 use RuntimeException;
 
 use function basename;
 use function closedir;
 use function is_dir;
+use function is_string;
 use function opendir;
 use function readdir;
 use function rmdir;
@@ -19,16 +20,37 @@ use function str_replace;
 use function unlink;
 
 /**
- * @psalm-suppress PropertyNotSetInConstructor
+ * Assertion utility class for advanced test introspection and manipulation.
+ *
+ * Provides static helper methods for accessing and modifying inaccessible properties and methods invoking parent class
+ * logic, and performing file system cleanup in test environments.
+ *
+ * Extends {@see \PHPUnit\Framework\Assert} to offer additional capabilities for testing private/protected members and
+ * for managing test artifacts, supporting robust and isolated unit tests.
+ *
+ * Key features.
+ * - Access and modify inaccessible (private/protected) properties and methods via reflection.
+ * - Invoke parent class methods and properties for testing inheritance scenarios.
+ * - Normalize line endings for cross-platform string assertions.
+ * - Remove files and directories recursively for test environment cleanup.
+ *
+ * @copyright Copyright (C) 2025 PHPForge.
+ * @license https://opensource.org/license/bsd-3-clause BSD 3-Clause License.
  */
-final class Assert extends TestCase
+final class Assert extends \PHPUnit\Framework\Assert
 {
     /**
-     * Asserting two strings equality ignoring line endings.
+     * Asserts that two strings are equal after normalizing line endings to unix style ('\n').
      *
-     * @param string $expected The expected string.
-     * @param string $actual The actual string.
-     * @param string $message The message to display if the assertion fails.
+     * Replaces all windows style ('\r\n') line endings with unix style ('\n') in both the expected and actual strings
+     * before performing the equality assertion.
+     *
+     * This ensures cross-platform consistency in string comparisons where line ending differences may otherwise cause
+     * `false` negatives.
+     *
+     * @param string $expected Expected string value, with any line endings.
+     * @param string $actual Actual string value, with any line endings.
+     * @param string $message Optional failure message to display if the assertion fails. Default is an empty string.
      */
     public static function equalsWithoutLE(string $expected, string $actual, string $message = ''): void
     {
@@ -39,74 +61,142 @@ final class Assert extends TestCase
     }
 
     /**
-     * Gets an inaccessible object property.
+     * Retrieves the value of an inaccessible property from a parent class instance.
      *
-     * @param object $object The object to get the property from.
-     * @param string $propertyName The name of the property to get.
+     * Uses reflection to access the specified property of the given parent class, allowing tests to inspect or assert
+     * the value of private or protected properties inherited from parent classes.
+     *
+     * This method is useful for verifying the internal state of objects in inheritance scenarios where direct access
+     * to parent properties is not possible.
+     *
+     * @param object $object Object instance from which to retrieve the property value.
+     * @param string|object $className Name or instance of the parent class containing the property.
+     * @param string $propertyName Name of the property to access.
+     *
+     * @throws ReflectionException
+     *
+     * @return mixed Value of the specified parent property.
+     *
+     * @phpstan-param class-string|object $className
      */
-    public static function inaccessibleProperty(object $object, string $propertyName): mixed
-    {
-        $class = new ReflectionClass($object);
+    public static function inaccessibleParentProperty(
+        object $object,
+        string|object $className,
+        string $propertyName,
+    ): mixed {
+        $class = new ReflectionClass($className);
 
-        $result = null;
-
-        if ($propertyName !== '') {
-            $property = $class->getProperty($propertyName);
-
-            /** @psalm-var mixed $result */
-            $result = $property->getValue($object);
-        }
-
-        return $result;
+        return $class->getProperty($propertyName)->getValue($object);
     }
 
     /**
-     * Invokes an inaccessible method.
+     * Retrieves the value of an inaccessible property from an object or class instance.
      *
-     * @param object $object The object to invoke the method on.
-     * @param string $method The name of the method to invoke.
-     * @param array $args The arguments to pass to the method.
+     * Uses reflection to access the specified property of the given object or class, allowing tests to inspect or
+     * assert the value of private or protected properties that are otherwise inaccessible.
+     *
+     * This method is useful for verifying the internal state of objects during testing, especially when direct access
+     * to the property is not possible due to visibility constraints.
+     *
+     * @param string|object $object Name of the class or object instance from which to retrieve the property value.
+     * @param string $propertyName Name of the property to access.
+     *
+     * @throws ReflectionException if the property does not exist or is inaccessible.
+     *
+     * @return mixed Value of the specified property, or `null` if the property name is empty.
+     *
+     * @phpstan-param class-string|object $object
+     */
+    public static function inaccessibleProperty(string|object $object, string $propertyName): mixed
+    {
+        $class = new ReflectionClass($object);
+
+        if ($propertyName !== '') {
+            $property = $class->getProperty($propertyName);
+            $result = is_string($object) ? $property->getValue() : $property->getValue($object);
+        }
+
+        return $result ?? null;
+    }
+
+    /**
+     * Invokes an inaccessible method on the given object instance with the specified arguments.
+     *
+     * Uses reflection to access and invoke a private or protected method of the provided object, allowing tests to
+     * execute logic that is not publicly accessible.
+     *
+     * This is useful for verifying internal behavior or side effects during unit testing.
+     *
+     * @param object $object Object instance containing the method to invoke.
+     * @param string $method Name of the method to invoke.
+     * @param array $args Arguments to pass to the method invocation.
+     *
+     * @throws ReflectionException if the method does not exist or is inaccessible.
+     *
+     * @return mixed Value of the invoked method, or `null` if the method name is empty.
+     *
+     * @phpstan-param array<array-key, mixed> $args
      */
     public static function invokeMethod(object $object, string $method, array $args = []): mixed
     {
         $reflection = new ReflectionObject($object);
 
-        $result = null;
-
         if ($method !== '') {
             $method = $reflection->getMethod($method);
-
-            /** @psalm-var mixed $result */
             $result = $method->invokeArgs($object, $args);
         }
 
-        return $result;
+        return $result ?? null;
     }
 
     /**
-     * Sets an inaccessible object property to a designated value.
+     * Invokes an inaccessible method from a parent class on the given object instance with the specified arguments.
+     *
+     * Uses reflection to access and invoke a private or protected method defined in the specified parent class,
+     * allowing tests to execute logic that is not publicly accessible from the child class.
+     *
+     * This is useful for verifying inherited behavior or side effects during unit testing of subclasses.
+     *
+     * @param object $object Object instance containing the method to invoke.
+     * @param string $parentClass Name of the parent class containing the method.
+     * @param string $method Name of the method to invoke.
+     * @param array $args Arguments to pass to the method invocation.
+     *
+     * @throws ReflectionException if the method does not exist or is inaccessible in the parent class.
+     *
+     * @return mixed Value of the invoked method, or `null` if the method name is empty.
+     *
+     * @phpstan-param class-string $parentClass
+     * @phpstan-param array<array-key, mixed> $args
      */
-    public static function setInaccessibleProperty(
+    public static function invokeParentMethod(
         object $object,
-        string $propertyName,
-        mixed $value
-    ): void {
-        $class = new ReflectionClass($object);
+        string $parentClass,
+        string $method,
+        array $args = [],
+    ): mixed {
+        $reflection = new ReflectionClass($parentClass);
 
-        if ($propertyName !== '') {
-            $property = $class->getProperty($propertyName);
-            $property->setValue($object, $value);
+        if ($method !== '') {
+            $method = $reflection->getMethod($method);
+            $result = $method->invokeArgs($object, $args);
         }
 
-        unset($class, $property);
+        return $result ?? null;
     }
 
     /**
-     * Remove files from the directory.
+     * Removes all files and directories recursively from the specified base path, excluding '.gitignore' and
+     * '.gitkeep'.
      *
-     * @param string $basePath The directory to remove files from.
+     * Opens the given directory, iterates through its contents, and removes all files and subdirectories except for
+     * special entries ('.', '..', '.gitignore', '.gitkeep').
      *
-     * @throws RuntimeException
+     * Subdirectories are processed recursively before removal.
+     *
+     * @param string $basePath Absolute path to the directory whose contents will be removed.
+     *
+     * @throws RuntimeException if the directory cannot be opened for reading.
      */
     public static function removeFilesFromDirectory(string $basePath): void
     {
@@ -133,5 +223,68 @@ final class Assert extends TestCase
         }
 
         closedir($handle);
+    }
+
+    /**
+     * Sets the value of an inaccessible property on a parent class instance.
+     *
+     * Uses reflection to assign the specified value to a private or protected property defined in the given parent
+     * class, enabling tests to modify internal state that is otherwise inaccessible due to visibility constraints in
+     * inheritance scenarios.
+     *
+     * This method is useful for testing scenarios that require direct manipulation of parent class internals.
+     *
+     * @param object $object Object instance whose parent property will be set.
+     * @param string $parentClass Name of the parent class containing the property.
+     * @param string $propertyName Name of the property to set.
+     * @param mixed $value Value to assign to the property.
+     *
+     * @throws ReflectionException if the property does not exist or is inaccessible in the parent class.
+     *
+     * @phpstan-param class-string $parentClass
+     */
+    public static function setInaccessibleParentProperty(
+        object $object,
+        string $parentClass,
+        string $propertyName,
+        mixed $value,
+    ): void {
+        $class = new ReflectionClass($parentClass);
+
+        if ($propertyName !== '') {
+            $property = $class->getProperty($propertyName);
+            $property->setValue($object, $value);
+        }
+
+        unset($class, $property);
+    }
+
+    /**
+     * Sets the value of an inaccessible property on the given object instance.
+     *
+     * Uses reflection to assign the specified value to a private or protected property of the provided object enabling
+     * tests to modify internal state that is otherwise inaccessible due to visibility constraints.
+     *
+     * This method is useful for testing scenarios that require direct manipulation of object internals.
+     *
+     * @param object $object Object instance whose property will be set.
+     * @param string $propertyName Name of the property to set.
+     * @param mixed $value Value to assign to the property.
+     *
+     * @throws ReflectionException if the property does not exist or is inaccessible.
+     */
+    public static function setInaccessibleProperty(
+        object $object,
+        string $propertyName,
+        mixed $value,
+    ): void {
+        $class = new ReflectionClass($object);
+
+        if ($propertyName !== '') {
+            $property = $class->getProperty($propertyName);
+            $property->setValue($object, $value);
+        }
+
+        unset($class, $property);
     }
 }
