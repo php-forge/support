@@ -73,23 +73,6 @@ composer update
 
 ## Basic Usage
 
-### Cross-platform string equality
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use PHPForge\Support\Assert;
-
-// Normalize line endings for consistent comparisons
-Assert::equalsWithoutLE(
-    "Foo\r\nBar",
-    "Foo\nBar",
-    "Should match regardless of line ending style"
-);
-```
-
 ### Accessing private properties
 
 ```php
@@ -103,9 +86,27 @@ $object = new class () {
     private string $secretValue = 'hidden';
 };
 
-// Access private properties for testing
+// access private properties for testing
 $value = Assert::inaccessibleProperty($object, 'secretValue');
-$this->assertSame('hidden', $value);
+
+self::assertSame('hidden', $value);
+```
+
+### Equals without line ending
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use PHPForge\Support\Assert;
+
+// normalize line endings for consistent comparisons
+Assert::equalsWithoutLE(
+    "Foo\r\nBar",
+    "Foo\nBar",
+    "Should match regardless of line ending style"
+);
 ```
 
 ### Invoking protected methods
@@ -124,12 +125,28 @@ $object = new class () {
     }
 };
 
-// Test protected method behavior
+// test protected method behavior
 $result = Assert::invokeMethod($object, 'calculate', [5, 3]);
-$this->assertSame(8, $result);
+
+self::assertSame(8, $result);
 ```
 
-### Modifying inaccessible properties
+### Remove files from directory
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use PHPForge\Support\Assert;
+
+$testDir = dirname(__DIR__) . '/runtime';
+
+// clean up test artifacts (preserves '.gitignore' and '.gitkeep')
+Assert::removeFilesFromDirectory($testDir);
+```
+
+### Set inaccessible property
 
 ```php
 <?php
@@ -142,34 +159,12 @@ $object = new class () {
     private string $config = 'default';
 };
 
-// Set private property for testing scenarios
+// set private property for testing scenarios
 Assert::setInaccessibleProperty($object, 'config', 'test-mode');
 
 $newValue = Assert::inaccessibleProperty($object, 'config');
-$this->assertSame('test-mode', $newValue);
-```
 
-### Test environment cleanup
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use PHPForge\Support\Assert;
-
-$testDir = __DIR__ . '/runtime';
-
-// Create test files and directories
-mkdir($testDir . '/subdir', 0755, true);
-touch($testDir . '/test.txt');
-touch($testDir . '/subdir/nested.txt');
-
-// Clean up test artifacts (preserves .gitignore and .gitkeep)
-Assert::removeFilesFromDirectory($testDir);
-
-$this->assertFileDoesNotExist($testDir . '/test.txt');
-$this->assertDirectoryDoesNotExist($testDir . '/subdir');
+self::assertSame('test-mode', $newValue);
 ```
 
 ## Documentation
