@@ -70,7 +70,7 @@ final class Assert extends \PHPUnit\Framework\Assert
      * to parent properties is not possible.
      *
      * @param object $object Object instance from which to retrieve the property value.
-     * @param string|object $className Name or instance of the parent class containing the property.
+     * @param object|string $className Name or instance of the parent class containing the property.
      * @param string $propertyName Name of the property to access.
      *
      * @throws ReflectionException
@@ -98,7 +98,7 @@ final class Assert extends \PHPUnit\Framework\Assert
      * This method is useful for verifying the internal state of objects during testing, especially when direct access
      * to the property is not possible due to visibility constraints.
      *
-     * @param string|object $object Name of the class or object instance from which to retrieve the property value.
+     * @param object|string $object Name of the class or object instance from which to retrieve the property value.
      * @param string $propertyName Name of the property to access.
      *
      * @throws ReflectionException if the property does not exist or is inaccessible.
