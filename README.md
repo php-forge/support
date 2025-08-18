@@ -86,7 +86,7 @@ final class AccessPrivatePropertyTest extends TestCase
 {
     use TestSupport;
 
-    public function testInaccesibleProperty():void
+    public function testInaccessibleProperty(): void
     {
         $object = new class () {
             private string $secretValue = 'hidden';
@@ -201,7 +201,7 @@ final class SetInaccessiblePropertyTest extends TestCase
 
         $newValue = self::inaccessibleProperty($object, 'config');
 
-        self::assertSame('test-mode',  $newValue, "Should set the inaccessible property to 'test-mode'.");
+         self::assertSame('test-mode', $newValue, "Should set the inaccessible property to 'test-mode'.");
     }
 }
 ```
