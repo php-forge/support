@@ -28,7 +28,7 @@
 - Invoke inaccessible methods to expand testing coverage.
 
 ✅ **Cross-Platform String Assertions**
-- Eliminate false positives/negatives caused by Windows vs. Unix line-ending differences.
+- Avoid false positives and negatives caused by Windows vs. Unix line ending differences.
 - Normalize line endings for consistent string comparisons across platforms.
 
 ✅ **File System Test Management**
@@ -50,7 +50,7 @@
 Install the extension.
 
 ```bash
-composer require --dev --prefer-dist php-forge/support:^0.1
+composer require --dev --prefer-dist php-forge/support:^0.2
 ```
 
 #### Method 2: Manual installation
@@ -60,7 +60,7 @@ Add to your `composer.json`.
 ```json
 {
     "require-dev": {
-        "php-forge/support": "^0.1"
+        "php-forge/support": "^0.2"
     }
 }
 ```
@@ -77,94 +77,133 @@ composer update
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
 
-$object = new class () {
-    private string $secretValue = 'hidden';
-};
+final class AccessPrivatePropertyTest extends TestCase
+{
+    use TestSupport;
 
-// access private properties for testing
-$value = Assert::inaccessibleProperty($object, 'secretValue');
+    public function testInaccessibleProperty(): void
+    {
+        $object = new class () {
+            private string $secretValue = 'hidden';
+        };
 
-self::assertSame('hidden', $value);
-```
+        $value = self::inaccessibleProperty($object, 'secretValue');
 
-### Equals without line ending
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use PHPForge\Support\Assert;
-
-// normalize line endings for consistent comparisons
-Assert::equalsWithoutLE(
-    "Foo\r\nBar",
-    "Foo\nBar",
-    "Should match regardless of line ending style"
-);
+        self::assertSame('hidden', $value, "Should access the private property and return its value.");
+    }
+}
 ```
 
 ### Invoking protected methods
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
 
-$object = new class () {
-    protected function calculate(int $a, int $b): int
+final class InvokeProtectedMethodTest extends TestCase
+{
+    use TestSupport;
+
+    public function testInvokeMethod(): void
     {
-        return $a + $b;
+        $object = new class () {
+            protected function calculate(int $a, int $b): int
+            {
+                return $a + $b;
+            }
+        };
+
+        $result = self::invokeMethod($object, 'calculate', [5, 3]);
+
+        self::assertSame(8, $result, "Should invoke the protected method and return the correct sum.");
     }
-};
+}
+```
 
-// test protected method behavior
-$result = Assert::invokeMethod($object, 'calculate', [5, 3]);
+### Normalize line endings
 
-self::assertSame(8, $result);
+```php
+<?php
+declare(strict_types=1);
+
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
+
+final class NormalizeLineEndingsTest extends TestCase
+{
+    use TestSupport;
+
+    public function testNormalizedComparison(): void
+    {
+        self::assertSame(
+            self::normalizeLineEndings("Foo\r\nBar"),
+            self::normalizeLineEndings("Foo\nBar"),
+            "Should match regardless of line ending style",
+        );
+    }
+}
 ```
 
 ### Remove files from directory
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
 
-$testDir = dirname(__DIR__) . '/runtime';
+final class RemoveFilesFromDirectoryTest extends TestCase
+{
+    use TestSupport;
 
-// clean up test artifacts (preserves '.gitignore' and '.gitkeep')
-Assert::removeFilesFromDirectory($testDir);
+    public function testCleanup(): void
+    {
+        $testDir = dirname(__DIR__) . '/runtime';
+        // clean up test artifacts (preserves '.gitignore' and '.gitkeep')
+
+        self::removeFilesFromDirectory($testDir);
+
+        self::assertTrue(true, "Should remove all files in the test directory while preserving Git-tracked files.");
+    }
+}
 ```
 
 ### Set inaccessible property
 
 ```php
 <?php
-
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
 
-$object = new class () {
-    private string $config = 'default';
-};
+final class SetInaccessiblePropertyTest extends TestCase
+{
+    use TestSupport;
 
-// set private property for testing scenarios
-Assert::setInaccessibleProperty($object, 'config', 'test-mode');
+    public function testSetProperty(): void
+    {
+        $object = new class () {
+            private string $config = 'default';
+        };
 
-$newValue = Assert::inaccessibleProperty($object, 'config');
+        // set private property for testing scenarios
+        self::setInaccessibleProperty($object, 'config', 'test-mode');
 
-self::assertSame('test-mode', $newValue);
+        $newValue = self::inaccessibleProperty($object, 'config');
+
+        self::assertSame('test-mode', $newValue, "Should set the inaccessible property to 'test-mode'.");
+    }
+}
 ```
 
 ## Documentation

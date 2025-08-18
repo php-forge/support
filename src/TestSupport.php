@@ -20,46 +20,20 @@ use function str_replace;
 use function unlink;
 
 /**
- * Assertion utility class for advanced test introspection and manipulation.
+ * Trait providing utilities for testing inaccessible properties, methods, and filesystem cleanup.
  *
- * Provides static helper methods for accessing and modifying inaccessible properties and methods invoking parent class
- * logic, and performing file system cleanup in test environments.
+ * Supplies static helper methods for normalizing line endings, accessing or modifying private/protected properties and
+ * methods (including those inherited from parent classes), invoking inaccessible methods, and recursively removing
+ * files from directories.
  *
- * Extends {@see \PHPUnit\Framework\Assert} to offer additional capabilities for testing private/protected members and
- * for managing test artifacts, supporting robust and isolated unit tests.
+ * These utilities are designed to facilitate comprehensive unit testing by enabling assertions and manipulations that
+ * would otherwise be restricted by visibility constraints or platform differences.
  *
- * Key features.
- * - Access and modify inaccessible (private/protected) properties and methods via reflection.
- * - Invoke parent class methods and properties for testing inheritance scenarios.
- * - Normalize line endings for cross-platform string assertions.
- * - Remove files and directories recursively for test environment cleanup.
- *
- * @copyright Copyright (C) 2025 PHPForge.
+ * @copyright Copyright (C) 2025 Terabytesoftw.
  * @license https://opensource.org/license/bsd-3-clause BSD 3-Clause License.
  */
-final class Assert extends \PHPUnit\Framework\Assert
+trait TestSupport
 {
-    /**
-     * Asserts that two strings are equal after normalizing line endings to unix style ('\n').
-     *
-     * Replaces all windows style ('\r\n') line endings with unix style ('\n') in both the expected and actual strings
-     * before performing the equality assertion.
-     *
-     * This ensures cross-platform consistency in string comparisons where line ending differences may otherwise cause
-     * `false` negatives.
-     *
-     * @param string $expected Expected string value, with any line endings.
-     * @param string $actual Actual string value, with any line endings.
-     * @param string $message Optional failure message to display if the assertion fails. Default is an empty string.
-     */
-    public static function equalsWithoutLE(string $expected, string $actual, string $message = ''): void
-    {
-        $expected = str_replace("\r\n", "\n", $expected);
-        $actual = str_replace("\r\n", "\n", $actual);
-
-        self::assertEquals($expected, $actual, $message);
-    }
-
     /**
      * Retrieves the value of an inaccessible property from a parent class instance.
      *
@@ -183,6 +157,23 @@ final class Assert extends \PHPUnit\Framework\Assert
         }
 
         return $result ?? null;
+    }
+
+    /**
+     * Normalizes line endings to Unix style ('\n') for cross-platform string assertions.
+     *
+     * Converts Windows style ('\r\n') line endings to Unix style ('\n') to ensure consistent string comparisons across
+     * different operating systems during testing.
+     *
+     * This method is useful for eliminating false negatives in assertions caused by platform-specific line endings.
+     *
+     * @param string $line Input string potentially containing Windows style line endings.
+     *
+     * @return string String with normalized Unix style line endings.
+     */
+    public static function normalizeLineEndings(string $line): string
+    {
+        return str_replace(["\r\n", "\r"], "\n", $line);
     }
 
     /**
