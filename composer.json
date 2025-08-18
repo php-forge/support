@@ -1,7 +1,7 @@
 {
     "name": "php-forge/support",
     "type": "library",
-    "description": "Support library tests for PHP",
+    "description": "Support utilities for enhanced testing capabilities.",
     "keywords": [
         "php",
         "php-forge",
@@ -11,16 +11,16 @@
     ],
     "license": "BSD-3-Clause",
     "require": {
-        "php": "^8.1",
-        "phpunit/phpunit": "^10.5"
+        "php": "^8.1"
     },
     "require-dev": {
         "infection/infection": "^0.27|^0.31",
         "maglnet/composer-require-checker": "^4.7",
-        "phpstan/phpstan-strict-rules": "^2.0.3",
-        "symplify/easy-coding-standard": "^12.5",
         "phpstan/phpstan": "^2.1",
-        "rector/rector": "^2.1"
+        "phpstan/phpstan-strict-rules": "^2.0.3",
+        "phpunit/phpunit": "^10.5",
+        "rector/rector": "^2.1",
+        "symplify/easy-coding-standard": "^12.5"
     },
     "autoload": {
         "psr-4": {

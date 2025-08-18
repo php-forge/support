@@ -4,41 +4,35 @@ declare(strict_types=1);
 
 namespace PHPForge\Support\Tests;
 
-use PHPForge\Support\Assert;
 use PHPForge\Support\Tests\Stub\{TestBaseClass, TestClass};
+use PHPForge\Support\TestSupport;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 use RuntimeException;
 
 /**
- * Test suite for {@see Assert} utility methods and reflection helpers.
+ * Test suite for {@see TestSupport} trait utility methods.
  *
- * Verifies the behavior of assertion and reflection-based utility methods for testing inaccessible properties, parent
- * properties, and methods, as well as file system operations for test directories.
+ * Verifies the behavior of utility methods provided by the {@see TestSupport} trait for testing inaccessible
+ * properties, parent properties, and methods, as well as file system operations for test directories.
  *
  * These tests ensure correct access and mutation of private/protected members, invocation of inaccessible methods, and
  * robust file removal logic, including error handling for non-existent directories.
  *
- * Test coverage.
+ * Test coverage:
  * - Accessing and asserting values of inaccessible properties and parent properties.
  * - Ensuring correct exception handling for invalid operations.
  * - Invoking inaccessible methods and parent methods.
+ * - Normalizing line endings.
  * - Removing files from directories and handling missing directories.
  * - Setting values for inaccessible properties and parent properties.
  *
  * @copyright Copyright (C) 2025 Terabytesoftw.
  * @license https://opensource.org/license/bsd-3-clause BSD 3-Clause License.
  */
-final class AssertTest extends TestCase
+final class TestSupportTest extends TestCase
 {
-    public function testEqualsWithoutLEReturnsTrueWhenStringsAreIdenticalWithLineEndings(): void
-    {
-        Assert::equalsWithoutLE(
-            "foo\r\nbar",
-            "foo\r\nbar",
-            "Should return 'true' when both strings are identical including line endings.",
-        );
-    }
+    use TestSupport;
 
     /**
      * @throws ReflectionException
@@ -47,12 +41,21 @@ final class AssertTest extends TestCase
     {
         self::assertSame(
             'valueParent',
-            Assert::inaccessibleParentProperty(
+            self::inaccessibleParentProperty(
                 new TestClass(),
                 TestBaseClass::class,
                 'propertyParent',
             ),
             "Should return the value of the parent property 'propertyParent' when accessed via reflection.",
+        );
+    }
+
+    public function testNormalizeLineEndingsWhenStringsAreIdenticalWithLineEndings(): void
+    {
+        self::assertSame(
+            self::normalizeLineEndings("foo\r\nbar"),
+            self::normalizeLineEndings("foo\r\nbar"),
+            "Should return 'true' when both strings are identical including line endings.",
         );
     }
 
@@ -64,7 +67,7 @@ final class AssertTest extends TestCase
         touch("{$dir}/test.txt");
         touch("{$dir}/subdir/test.txt");
 
-        Assert::removeFilesFromDirectory($dir);
+        self::removeFilesFromDirectory($dir);
 
         $this->assertFileDoesNotExist(
             "{$dir}/test.txt",
@@ -83,7 +86,7 @@ final class AssertTest extends TestCase
     {
         self::assertSame(
             'value',
-            Assert::inaccessibleProperty(new TestClass(), 'property'),
+            self::inaccessibleProperty(new TestClass(), 'property'),
             "Should return the value of the private property 'property' when accessed via reflection.",
         );
     }
@@ -95,7 +98,7 @@ final class AssertTest extends TestCase
     {
         $this->assertSame(
             'value',
-            Assert::invokeMethod(new TestClass(), 'inaccessibleMethod'),
+            self::invokeMethod(new TestClass(), 'inaccessibleMethod'),
             "Should return 'value' when invoking the inaccessible method 'inaccessibleParentMethod' on 'TestClass' " .
             'via reflection.',
         );
@@ -108,7 +111,7 @@ final class AssertTest extends TestCase
     {
         $this->assertSame(
             'valueParent',
-            Assert::invokeParentMethod(
+            self::invokeParentMethod(
                 new TestClass(),
                 TestBaseClass::class,
                 'inaccessibleParentMethod',
@@ -125,11 +128,11 @@ final class AssertTest extends TestCase
     {
         $object = new TestClass();
 
-        Assert::setInaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent', 'foo');
+        self::setInaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent', 'foo');
 
         $this->assertSame(
             'foo',
-            Assert::inaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent'),
+            self::inaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent'),
             "Should return 'foo' after setting the parent property 'propertyParent' via " .
             "'setInaccessibleParentProperty' method.",
         );
@@ -142,11 +145,11 @@ final class AssertTest extends TestCase
     {
         $object = new TestClass();
 
-        Assert::setInaccessibleProperty($object, 'property', 'foo');
+        self::setInaccessibleProperty($object, 'property', 'foo');
 
         $this->assertSame(
             'foo',
-            Assert::inaccessibleProperty($object, 'property'),
+            self::inaccessibleProperty($object, 'property'),
             "Should return 'foo' after setting the private property 'property' via 'setInaccessibleProperty' method.",
         );
     }
@@ -156,6 +159,6 @@ final class AssertTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to open directory: non-existing-directory');
 
-        Assert::removeFilesFromDirectory(__DIR__ . '/non-existing-directory');
+        self::removeFilesFromDirectory(__DIR__ . '/non-existing-directory');
     }
 }

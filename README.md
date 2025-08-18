@@ -28,7 +28,7 @@
 - Invoke inaccessible methods to expand testing coverage.
 
 ✅ **Cross-Platform String Assertions**
-- Eliminate false positives/negatives caused by Windows vs. Unix line-ending differences.
+- Eliminate false positives/negatives caused by windows vs. unix line ending differences.
 - Normalize line endings for consistent string comparisons across platforms.
 
 ✅ **File System Test Management**
@@ -72,6 +72,33 @@ composer update
 ```
 
 ## Basic Usage
+
+### Using TestSupport trait
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use PHPForge\Support\TestSupport;
+use PHPUnit\Framework\TestCase;
+
+final class MyTest extends TestCase
+{
+    use TestSupport;
+
+    public function testInaccessibleProperty()
+    {
+        $object = new class () {
+            private string $secretValue = 'hidden';
+        };
+
+        $value = $this->inaccessibleProperty($object, 'secretValue');
+
+        self::assertSame('hidden', $value);
+    }
+}
+```
 
 ### Accessing private properties
 
