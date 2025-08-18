@@ -55,7 +55,7 @@ final class TestSupportTest extends TestCase
         self::assertSame(
             self::normalizeLineEndings("foo\r\nbar"),
             self::normalizeLineEndings("foo\nbar"),
-            "Should produce the same normalized string for CRLF and LF inputs.",
+            'Should produce the same normalized string for CRLF and LF inputs.',
         );
     }
 
