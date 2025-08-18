@@ -6,8 +6,6 @@ on:
       - 'CHANGELOG.md'
       - '.gitignore'
       - '.gitattributes'
-      - 'infection.json.dist'
-      - 'phpunit.xml.dist'
 
   push:
     paths-ignore:
@@ -16,16 +14,9 @@ on:
       - 'CHANGELOG.md'
       - '.gitignore'
       - '.gitattributes'
-      - 'infection.json.dist'
-      - 'phpunit.xml.dist'
 
 name: static analysis
 
 jobs:
   psalm:
-    uses: php-forge/actions/.github/workflows/psalm.yml@main
-    with:
-      os: >-
-        ['ubuntu-latest']
-      php: >-
-        ['8.1', '8.2', '8.3']
+    uses: php-forge/actions/.github/workflows/phpstan.yml@v1
