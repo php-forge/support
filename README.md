@@ -50,7 +50,7 @@
 Install the extension.
 
 ```bash
-composer require --dev --prefer-dist php-forge/support:^0.1
+composer require --dev --prefer-dist php-forge/support:^0.2
 ```
 
 #### Method 2: Manual installation
@@ -60,7 +60,7 @@ Add to your `composer.json`.
 ```json
 {
     "require-dev": {
-        "php-forge/support": "^0.1"
+        "php-forge/support": "^0.2"
     }
 }
 ```
@@ -93,7 +93,7 @@ final class MyTest extends TestCase
             private string $secretValue = 'hidden';
         };
 
-        $value = $this->inaccessibleProperty($object, 'secretValue');
+        $value = self::inaccessibleProperty($object, 'secretValue');
 
         self::assertSame('hidden', $value);
     }
@@ -107,14 +107,12 @@ final class MyTest extends TestCase
 
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
-
 $object = new class () {
     private string $secretValue = 'hidden';
 };
 
 // access private properties for testing
-$value = Assert::inaccessibleProperty($object, 'secretValue');
+$value = self::inaccessibleProperty($object, 'secretValue');
 
 self::assertSame('hidden', $value);
 ```
@@ -126,12 +124,10 @@ self::assertSame('hidden', $value);
 
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
-
 // normalize line endings for consistent comparisons
-Assert::equalsWithoutLE(
-    "Foo\r\nBar",
-    "Foo\nBar",
+self::assertSame(
+    self::normalizeLineEndings("Foo\r\nBar"),
+    self::normalizeLineEndings("Foo\nBar"),
     "Should match regardless of line ending style"
 );
 ```
@@ -143,8 +139,6 @@ Assert::equalsWithoutLE(
 
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
-
 $object = new class () {
     protected function calculate(int $a, int $b): int
     {
@@ -153,7 +147,7 @@ $object = new class () {
 };
 
 // test protected method behavior
-$result = Assert::invokeMethod($object, 'calculate', [5, 3]);
+$result = self::invokeMethod($object, 'calculate', [5, 3]);
 
 self::assertSame(8, $result);
 ```
@@ -165,12 +159,10 @@ self::assertSame(8, $result);
 
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
-
 $testDir = dirname(__DIR__) . '/runtime';
 
 // clean up test artifacts (preserves '.gitignore' and '.gitkeep')
-Assert::removeFilesFromDirectory($testDir);
+self::removeFilesFromDirectory($testDir);
 ```
 
 ### Set inaccessible property
@@ -180,16 +172,14 @@ Assert::removeFilesFromDirectory($testDir);
 
 declare(strict_types=1);
 
-use PHPForge\Support\Assert;
-
 $object = new class () {
     private string $config = 'default';
 };
 
 // set private property for testing scenarios
-Assert::setInaccessibleProperty($object, 'config', 'test-mode');
+self::setInaccessibleProperty($object, 'config', 'test-mode');
 
-$newValue = Assert::inaccessibleProperty($object, 'config');
+$newValue = self::inaccessibleProperty($object, 'config');
 
 self::assertSame('test-mode', $newValue);
 ```
