@@ -24,16 +24,16 @@
 ## Features
 
 ✅ **Advanced Reflection Utilities**
-- Access and modify private/protected properties via reflection.
-- Invoke inaccessible methods for comprehensive testing coverage.
+- Access and modify private and protected properties via reflection.
+- Invoke inaccessible methods to expand testing coverage.
 
 ✅ **Cross-Platform String Assertions**
-- Eliminate false negatives from Windows/Unix line ending differences.
+- Eliminate false positives/negatives caused by Windows vs. Unix line-ending differences.
 - Normalize line endings for consistent string comparisons across platforms.
 
 ✅ **File System Test Management**
-- Recursive file and directory cleanup for isolated test environments.
-- Safe removal operations preserving Git tracking files.
+- Recursively clean files and directories for isolated test environments.
+- Safe removal that preserves Git-tracking files (for example, '.gitignore', '.gitkeep').
 
 ## Quick start
 
