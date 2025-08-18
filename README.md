@@ -28,7 +28,7 @@
 - Invoke inaccessible methods to expand testing coverage.
 
 ✅ **Cross-Platform String Assertions**
-- Eliminate false positives/negatives caused by Windows vs. Unix line ending differences.
+- Avoid false positives and negatives caused by Windows vs Unix line-ending differences.
 - Normalize line endings for consistent string comparisons across platforms.
 
 ✅ **File System Test Management**
@@ -190,7 +190,7 @@ final class SetInaccessiblePropertyTest extends TestCase
 {
     use TestSupport;
 
-    public function testSetProperty()
+    public function testSetProperty(): void
     {
         $object = new class () {
             private string $config = 'default';
@@ -201,7 +201,7 @@ final class SetInaccessiblePropertyTest extends TestCase
 
         $newValue = self::inaccessibleProperty($object, 'config');
 
-         self::assertSame('test-mode', $newValue, "Should set the inaccessible property to 'test-mode'.");
+        self::assertSame('test-mode', $newValue, "Should set the inaccessible property to 'test-mode'.");
     }
 }
 ```
