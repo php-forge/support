@@ -173,7 +173,7 @@ trait TestSupport
      */
     public static function normalizeLineEndings(string $line): string
     {
-        return str_replace("\r\n", "\n", $line);
+        return str_replace(["\r\n", "\r"], "\n", $line);
     }
 
     /**
