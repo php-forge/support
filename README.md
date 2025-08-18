@@ -14,7 +14,7 @@
         <img src="https://github.com/php-forge/support/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
     </a>
     <a href="https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main" target="_blank">
-        <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Fasset-bootstrap5%2Fmain" alt="Infection">
+        <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fphp-forge%2Fsupport%2Fmain" alt="Infection">
     </a>        
         <a href="https://github.com/php-forge/support/actions/workflows/static.yml" target="_blank">        
         <img src="https://github.com/php-forge/support/actions/workflows/static.yml/badge.svg" alt="Static Analysis">
@@ -50,7 +50,7 @@
 Install the extension.
 
 ```bash
-composer require --prefer-dist php-forge/support
+composer require --dev --prefer-dist php-forge/support:^0.1
 ```
 
 #### Method 2: Manual installation
@@ -188,5 +188,3 @@ For comprehensive testing guidance, see:
 ## License
 
 [![License](https://img.shields.io/github/license/php-forge/support?cacheSeconds=0)](LICENSE.md)
-
-The MIT License. Please see [License File](LICENSE.md) for more information.
