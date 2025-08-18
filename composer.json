@@ -19,7 +19,7 @@
         "maglnet/composer-require-checker": "^4.7",
         "phpstan/phpstan-strict-rules": "^2.0.3",
         "symplify/easy-coding-standard": "^12.5",
-        "phpstan/phpstan" : "^2.1",
+        "phpstan/phpstan": "^2.1",
         "rector/rector": "^2.1"
     },
     "autoload": {
