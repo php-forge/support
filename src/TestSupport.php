@@ -160,16 +160,16 @@ trait TestSupport
     }
 
     /**
-     * Normalizes line endings to unix style ('\n') for cross-platform string assertions.
+     * Normalizes line endings to Unix style ('\n') for cross-platform string assertions.
      *
-     * Converts windows style ('\r\n') line endings to unix style ('\n') to ensure consistent string comparisons across
+     * Converts Windows style ('\r\n') line endings to Unix style ('\n') to ensure consistent string comparisons across
      * different operating systems during testing.
      *
      * This method is useful for eliminating false negatives in assertions caused by platform-specific line endings.
      *
-     * @param string $line Input string potentially containing windows style line endings.
+     * @param string $line Input string potentially containing Windows style line endings.
      *
-     * @return string String with normalized unix style line endings.
+     * @return string String with normalized Unix style line endings.
      */
     public static function normalizeLineEndings(string $line): string
     {
