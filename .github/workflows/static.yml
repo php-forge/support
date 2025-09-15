@@ -19,4 +19,4 @@ name: static analysis
 
 jobs:
   psalm:
-    uses: php-forge/actions/.github/workflows/phpstan.yml@v1
+    uses: php-forge/actions/.github/workflows/phpstan.yml@v2
