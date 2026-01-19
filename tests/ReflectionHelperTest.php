@@ -44,6 +44,14 @@ final class ReflectionHelperTest extends TestCase
         );
     }
 
+    public function testInaccessiblePropertyReturnsNullForEmptyPropertyName(): void
+    {
+        self::assertNull(
+            ReflectionHelper::inaccessibleProperty(new TestClass(), ''),
+            'Should return null when property name is empty.',
+        );
+    }
+
     /**
      * @throws ReflectionException
      */
@@ -117,5 +125,15 @@ final class ReflectionHelperTest extends TestCase
             ReflectionHelper::inaccessibleProperty($object, 'property'),
             "Should return 'foo' after setting the private property 'property' via 'setInaccessibleProperty' method.",
         );
+    }
+
+    public function testThrowReflectionExceptionForNonExistentProperty(): void
+    {
+        $this->expectException(ReflectionException::class);
+        $this->expectExceptionMessage(
+            'Property PHPForge\Support\Tests\Stub\TestClass::$nonExistent does not exist',
+        );
+
+        ReflectionHelper::inaccessibleProperty(new TestClass(), 'nonExistent');
     }
 }

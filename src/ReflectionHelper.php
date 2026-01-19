@@ -198,7 +198,5 @@ final class ReflectionHelper
             $property = $class->getProperty($propertyName);
             $property->setValue($object, $value);
         }
-
-        unset($class, $property);
     }
 }

@@ -10,6 +10,7 @@ use RuntimeException;
 use function basename;
 use function closedir;
 use function is_dir;
+use function is_link;
 use function opendir;
 use function readdir;
 use function rmdir;
@@ -63,7 +64,7 @@ final class DirectoryCleaner
 
             $path = $basePath . DIRECTORY_SEPARATOR . $file;
 
-            if (is_dir($path)) {
+            if (is_dir($path) && is_link($path) === false) {
                 self::clean($path);
                 @rmdir($path);
             } else {

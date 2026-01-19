@@ -48,17 +48,4 @@ final class EnumDataProviderProvider
             ],
         ];
     }
-
-    /**
-     * @return array<string, array{string, string}>
-     */
-    public static function tagCasesParameters(): array
-    {
-        return [
-            'default category' => [
-                TestEnum::class,
-                'element',
-            ],
-        ];
-    }
 }
