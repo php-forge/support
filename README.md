@@ -32,21 +32,6 @@
     <img src="./docs/svgs/features-mobile.svg" alt="Feature Overview" style="width: 100%;">
 </picture>
 
-**Advanced Reflection Utilities**
-- Access and modify private and protected properties via reflection.
-- Invoke inaccessible methods to expand testing coverage.
-
-**Cross-Platform String Assertions**
-- Avoid false positives and negatives caused by Windows vs. Unix line ending differences.
-- Normalize line endings for consistent string comparisons across platforms.
-
-**File System Test Management**
-- Recursively clean files and directories for isolated test environments.
-- Safe removal that preserves Git-tracking files (for example, `.gitignore`, `.gitkeep`).
-
-**Enum Test Data Generation**
-- Generate structured, deterministic datasets for enum-based attribute scenarios via `PHPForge\Support\EnumDataGenerator`.
-
 ### Installation
 
 ```bash
