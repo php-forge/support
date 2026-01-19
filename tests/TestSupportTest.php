@@ -125,7 +125,7 @@ final class TestSupportTest extends TestCase
         self::assertSame(
             'value',
             self::invokeMethod(new TestClass(), 'inaccessibleMethod'),
-            "Should return 'value' when invoking the inaccessible method 'inaccessibleParentMethod' on 'TestClass' "
+            "Should return 'value' when invoking the inaccessible method 'inaccessibleMethod' on 'TestClass' "
             . 'via reflection.',
         );
     }
@@ -159,8 +159,8 @@ final class TestSupportTest extends TestCase
         self::assertSame(
             'foo',
             self::inaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent'),
-            "Should return 'value' when invoking the inaccessible method 'inaccessibleMethod' on 'TestClass' "
-            . "'setInaccessibleParentProperty' method.",
+            "Should return 'foo' after setting parent property 'propertyParent' "
+            . "via 'setInaccessibleParentProperty' method.",
         );
     }
 
