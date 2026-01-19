@@ -70,39 +70,39 @@ final class TestSupportTest extends TestCase
 
     public function testRemoveFilesFromDirectoryRemovesAllFiles(): void
     {
-        $dir = __DIR__ . '/Support/runtime';
+        $dir = sys_get_temp_dir() . '/php-forge-support-' . bin2hex(random_bytes(8));
+        mkdir($dir);
 
-        if (is_dir($dir)) {
-            unlink("{$dir}/.gitignore");
-            unlink("{$dir}/.gitkeep");
-            rmdir($dir);
+        try {
+            mkdir("{$dir}/subdir");
+            touch("{$dir}/test.txt");
+            touch("{$dir}/subdir/test.txt");
+            touch("{$dir}/.gitignore");
+            touch("{$dir}/.gitkeep");
+
+            self::removeFilesFromDirectory($dir);
+
+            self::assertFileDoesNotExist(
+                "{$dir}/test.txt",
+                "File 'test.txt' should not exist after 'removeFilesFromDirectory' method is called.",
+            );
+            self::assertFileDoesNotExist(
+                "{$dir}/subdir/test.txt",
+                "File 'subdir/test.txt' should not exist after 'removeFilesFromDirectory' method is called.",
+            );
+            self::assertFileExists(
+                "{$dir}/.gitignore",
+                "File '.gitignore' should remain after 'removeFilesFromDirectory' method is called.",
+            );
+            self::assertFileExists(
+                "{$dir}/.gitkeep",
+                "File '.gitkeep' should remain after 'removeFilesFromDirectory' method is called.",
+            );
+        } finally {
+            @unlink("{$dir}/.gitignore");
+            @unlink("{$dir}/.gitkeep");
+            @rmdir($dir);
         }
-
-        mkdir($dir, 0777, true);
-        mkdir("{$dir}/subdir");
-        touch("{$dir}/test.txt");
-        touch("{$dir}/subdir/test.txt");
-        touch("{$dir}/.gitignore");
-        touch("{$dir}/.gitkeep");
-
-        self::removeFilesFromDirectory($dir);
-
-        self::assertFileDoesNotExist(
-            "{$dir}/test.txt",
-            "File 'test.txt' should not exist after 'removeFilesFromDirectory' method is called.",
-        );
-        self::assertFileDoesNotExist(
-            "{$dir}/subdir/test.txt",
-            "File 'subdir/test.txt' should not exist after 'removeFilesFromDirectory' method is called.",
-        );
-        self::assertFileExists(
-            "{$dir}/.gitignore",
-            "File '.gitignore' should remain after 'removeFilesFromDirectory' method is called.",
-        );
-        self::assertFileExists(
-            "{$dir}/.gitkeep",
-            "File '.gitkeep' should remain after 'removeFilesFromDirectory' method is called.",
-        );
     }
 
     /**
@@ -159,7 +159,7 @@ final class TestSupportTest extends TestCase
         self::assertSame(
             'foo',
             self::inaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent'),
-            "Should return 'foo' after setting the parent property 'propertyParent' via "
+            "Should return 'value' when invoking the inaccessible method 'inaccessibleMethod' on 'TestClass' "
             . "'setInaccessibleParentProperty' method.",
         );
     }
