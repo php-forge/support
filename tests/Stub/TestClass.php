@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PHPForge\Support\Tests\Stub;
 
 /**
- * Concrete test class extending TestBaseClass for inheritance and visibility testing.
+ * Stub for a concrete test class extending TestBaseClass for inheritance and visibility testing.
  *
  * Provides a private property and a protected method to verify property and method accessibility in child classes.
  *
