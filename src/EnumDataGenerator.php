@@ -29,6 +29,7 @@ final class EnumDataGenerator
      * `true`) or the enum case instance (when `$asHtml` is `false`).
      *
      * @phpstan-param class-string<UnitEnum> $enumClass Enum class name implementing UnitEnum.
+     *
      * @param string $enumClass Enum class name implementing UnitEnum.
      * @param string|UnitEnum $attribute Attribute name used to build the expected fragment.
      * @param bool $asHtml Whether to generate expected output as an attribute fragment or enum instance. Default is `true`.
@@ -69,6 +70,7 @@ final class EnumDataGenerator
      * data provider methods in PHPUnit tests.
      *
      * @phpstan-param class-string<UnitEnum> $enumClass Enum class name implementing UnitEnum.
+     *
      * @param string $enumClass Enum class name implementing UnitEnum.
      * @param string $category Category label appended to the generated keys.
      *
