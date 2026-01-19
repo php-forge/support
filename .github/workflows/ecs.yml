@@ -10,12 +10,12 @@ on:
 
   push: *ignore-paths
 
-name: Composer require checker
+name: ecs
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  composer-require-checker:
-    uses: yii2-framework/actions/.github/workflows/composer-require-checker.yml@v1
+  easy-coding-standard:
+    uses: yii2-framework/actions/.github/workflows/ecs.yml@v1

@@ -1,90 +1,61 @@
+<!-- markdownlint-disable MD041 -->
 <p align="center">
     <a href="https://github.com/php-forge/support" target="_blank">
-        <img src="https://avatars.githubusercontent.com/u/103309199?s%25253D400%252526u%25253Dca3561c692f53ed7eb290d3bb226a2828741606f%252526v%25253D4" height="100px">
+        <img src="https://avatars.githubusercontent.com/u/103309199?s%25253D400%252526u%25253Dca3561c692f53ed7eb290d3bb226a2828741606f%252526v%25253D4" height="150px" alt="PHP Forge">
     </a>
-    <h1 align="center">Support utilities for enhanced testing capabilities.</h1>
+    <h1 align="center">Support</h1>
     <br>
+</p>
+<!-- markdownlint-enable MD041 -->
+
+<p align="center">
+    <a href="https://github.com/php-forge/support/actions/workflows/build.yml" target="_blank">
+        <img src="https://img.shields.io/github/actions/workflow/status/php-forge/support/build.yml?style=for-the-badge&label=PHPUnit&logo=github" alt="PHPUnit">
+    </a>
+    <a href="https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main" target="_blank">
+        <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fphp-forge%2Fsupport%2Fmain" alt="Mutation Testing">
+    </a>
+    <a href="https://github.com/php-forge/support/actions/workflows/static.yml" target="_blank">
+        <img src="https://img.shields.io/github/actions/workflow/status/php-forge/support/static.yml?style=for-the-badge&label=PHPStan&logo=github" alt="PHPStan">
+    </a>
 </p>
 
 <p align="center">
-    <a href="https://www.php.net/releases/8.1/en.php" target="_blank">
-        <img src="https://img.shields.io/badge/PHP-%3E%3D8.1-787CB5" alt="PHP Version">
-    </a>
-    <a href="https://github.com/php-forge/support/actions/workflows/build.yml" target="_blank">
-        <img src="https://github.com/php-forge/support/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
-    </a>
-    <a href="https://dashboard.stryker-mutator.io/reports/github.com/php-forge/support/main" target="_blank">
-        <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fphp-forge%2Fsupport%2Fmain" alt="Infection">
-    </a>        
-        <a href="https://github.com/php-forge/support/actions/workflows/static.yml" target="_blank">        
-        <img src="https://github.com/php-forge/support/actions/workflows/static.yml/badge.svg" alt="Static Analysis">
-    </a>  
+    <strong>Support utilities for PHPUnit-focused development</strong><br>
+    <em>Reflection helpers, line ending normalization, and filesystem cleanup for deterministic tests.</em>
 </p>
 
 ## Features
 
-✅ **Advanced Reflection Utilities**
-- Access and modify private and protected properties via reflection.
-- Invoke inaccessible methods to expand testing coverage.
-
-✅ **Cross-Platform String Assertions**
-- Avoid false positives and negatives caused by Windows vs. Unix line ending differences.
-- Normalize line endings for consistent string comparisons across platforms.
-
-✅ **File System Test Management**
-- Recursively clean files and directories for isolated test environments.
-- Safe removal that preserves Git-tracking files (for example, '.gitignore', '.gitkeep').
-
-## Quick start
-
-### System requirements
-
-- [`PHP`](https://www.php.net/downloads) 8.1 or higher.
-- [`Composer`](https://getcomposer.org/download/) for dependency management.
-- [`PHPUnit`](https://phpunit.de/) for testing framework integration.
+<picture>
+    <source media="(min-width: 768px)" srcset="./docs/svgs/features.svg">
+    <img src="./docs/svgs/features-mobile.svg" alt="Feature Overview" style="width: 100%;">
+</picture>
 
 ### Installation
 
-#### Method 1: Using [Composer](https://getcomposer.org/download/) (recommended)
-
-Install the extension.
-
 ```bash
-composer require --dev --prefer-dist php-forge/support:^0.2
+composer require php-forge/support:^0.2 --dev
 ```
 
-#### Method 2: Manual installation
+### Quick start
 
-Add to your `composer.json`.
+This package provides helper classes for PHPUnit tests.
 
-```json
-{
-    "require-dev": {
-        "php-forge/support": "^0.2"
-    }
-}
-```
+It supports reflection-based access to non-public members, deterministic string comparisons across platforms, and filesystem cleanup for isolated test environments.
 
-Then run.
-
-```bash
-composer update
-```
-
-## Basic Usage
-
-### Accessing private properties
+#### Accessing private properties
 
 ```php
 <?php
+
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class AccessPrivatePropertyTest extends TestCase
 {
-    use TestSupport;
 
     public function testInaccessibleProperty(): void
     {
@@ -92,25 +63,25 @@ final class AccessPrivatePropertyTest extends TestCase
             private string $secretValue = 'hidden';
         };
 
-        $value = self::inaccessibleProperty($object, 'secretValue');
+        $value = ReflectionHelper::inaccessibleProperty($object, 'secretValue');
 
-        self::assertSame('hidden', $value, "Should access the private property and return its value.");
+        self::assertSame('hidden', $value);
     }
 }
 ```
 
-### Invoking protected methods
+#### Invoking protected methods
 
 ```php
 <?php
+
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class InvokeProtectedMethodTest extends TestCase
 {
-    use TestSupport;
 
     public function testInvokeMethod(): void
     {
@@ -121,74 +92,82 @@ final class InvokeProtectedMethodTest extends TestCase
             }
         };
 
-        $result = self::invokeMethod($object, 'calculate', [5, 3]);
+        $result = ReflectionHelper::invokeMethod($object, 'calculate', [5, 3]);
 
-        self::assertSame(8, $result, "Should invoke the protected method and return the correct sum.");
+        self::assertSame(8, $result);
     }
 }
 ```
 
-### Normalize line endings
+#### Normalize line endings
 
 ```php
 <?php
+
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\LineEndingNormalizer;
 use PHPUnit\Framework\TestCase;
 
 final class NormalizeLineEndingsTest extends TestCase
 {
-    use TestSupport;
 
     public function testNormalizedComparison(): void
     {
         self::assertSame(
-            self::normalizeLineEndings("Foo\r\nBar"),
-            self::normalizeLineEndings("Foo\nBar"),
-            "Should match regardless of line ending style",
+            LineEndingNormalizer::normalize("Foo\r\nBar"),
+            LineEndingNormalizer::normalize("Foo\nBar"),
         );
     }
 }
 ```
 
-### Remove files from directory
+#### Remove files from directory
 
 ```php
 <?php
+
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\DirectoryCleaner;
 use PHPUnit\Framework\TestCase;
 
 final class RemoveFilesFromDirectoryTest extends TestCase
 {
-    use TestSupport;
 
     public function testCleanup(): void
     {
-        $testDir = dirname(__DIR__) . '/runtime';
-        // clean up test artifacts (preserves '.gitignore' and '.gitkeep')
+        $testDir = sys_get_temp_dir() . '/php-forge-support-' . bin2hex(random_bytes(8));
+        mkdir($testDir);
 
-        self::removeFilesFromDirectory($testDir);
+        try {
+            file_put_contents($testDir . '/artifact.txt', 'test');
+            file_put_contents($testDir . '/.gitignore', "*\n");
 
-        self::assertTrue(true, "Should remove all files in the test directory while preserving Git-tracked files.");
+            DirectoryCleaner::clean($testDir);
+
+            self::assertFileDoesNotExist($testDir . '/artifact.txt');
+            self::assertFileExists($testDir . '/.gitignore');
+        } finally {
+            @unlink($testDir . '/.gitignore');
+            @rmdir($testDir);
+        }
     }
 }
 ```
 
-### Set inaccessible property
+#### Set inaccessible property
 
 ```php
 <?php
+
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class SetInaccessiblePropertyTest extends TestCase
 {
-    use TestSupport;
 
     public function testSetProperty(): void
     {
@@ -196,34 +175,150 @@ final class SetInaccessiblePropertyTest extends TestCase
             private string $config = 'default';
         };
 
-        // set private property for testing scenarios
-        self::setInaccessibleProperty($object, 'config', 'test-mode');
+        ReflectionHelper::setInaccessibleProperty($object, 'config', 'test-mode');
 
-        $newValue = self::inaccessibleProperty($object, 'config');
+        $newValue = ReflectionHelper::inaccessibleProperty($object, 'config');
 
-        self::assertSame('test-mode', $newValue, "Should set the inaccessible property to 'test-mode'.");
+        self::assertSame('test-mode', $newValue);
+    }
+}
+```
+
+#### Enum data provider
+
+Use `PHPForge\Support\EnumDataProvider` to build deterministic datasets from `UnitEnum::cases()` and normalized enum values.
+
+##### Attribute fragment output (HTML)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests;
+
+use PHPForge\Support\EnumDataProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use UnitEnum;
+
+enum Size
+{
+    case Small;
+    case Large;
+}
+
+final class EnumDataProviderHtmlTest extends TestCase
+{
+    public static function provideEnumAttributes(): array
+    {
+        return EnumDataProvider::attributeCases(Size::class, 'data-size', true);
+    }
+
+    #[DataProvider('provideEnumAttributes')]
+    public function testBuildsAttributeFragment(UnitEnum $case, array $args, string $expected, string $message): void
+    {
+        $normalized = $case->name;
+        $attributeFragment = " data-size=\"{$normalized}\"";
+
+        self::assertSame($expected, $attributeFragment, $message);
+    }
+}
+```
+
+##### Enum instance output (non-HTML)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests;
+
+use PHPForge\Support\EnumDataProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use UnitEnum;
+
+enum State
+{
+    case Active;
+    case Disabled;
+}
+
+final class EnumDataProviderEnumTest extends TestCase
+{
+    public static function provideEnumInstances(): array
+    {
+        return EnumDataProvider::attributeCases(State::class, 'state', false);
+    }
+
+    #[DataProvider('provideEnumInstances')]
+    public function testReturnsEnumInstance(UnitEnum $case, array $args, UnitEnum $expected, string $message): void
+    {
+        self::assertSame($case, $expected, $message);
+    }
+}
+```
+
+##### Tag cases
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests;
+
+use PHPForge\Support\EnumDataProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+
+enum Heading
+{
+    case H1;
+    case H2;
+}
+
+final class EnumDataProviderTagCasesTest extends TestCase
+{
+    public static function provideTags(): array
+    {
+        return EnumDataProvider::tagCases(Heading::class, 'heading');
+    }
+
+    #[DataProvider('provideTags')]
+    public function testProvidesNormalizedTag(Heading $case, string $normalized): void
+    {
+        self::assertSame($case->name, $normalized);
     }
 }
 ```
 
 ## Documentation
 
-For comprehensive testing guidance, see:
+For detailed configuration options and advanced usage.
 
-- 🧪 [Testing Guide](docs/testing.md)
+- [Testing Guide](docs/testing.md)
+- [Development Guide](docs/development.md)
+
+## Package information
+
+[![PHP](https://img.shields.io/badge/%3E%3D8.1-777BB4.svg?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/releases/8.1/en.php)
+[![Latest Stable Version](https://img.shields.io/packagist/v/php-forge/support.svg?style=for-the-badge&logo=packagist&logoColor=white&label=Stable)](https://packagist.org/packages/php-forge/support)
+[![Total Downloads](https://img.shields.io/packagist/dt/php-forge/support.svg?style=for-the-badge&logo=composer&logoColor=white&label=Downloads)](https://packagist.org/packages/php-forge/support)
 
 ## Quality code
 
-[![Latest Stable Version](https://poser.pugx.org/php-forge/support/v)](https://github.com/php-forge/support/releases)
-[![Total Downloads](https://poser.pugx.org/php-forge/support/downloads)](https://packagist.org/packages/php-forge/support)
-[![codecov](https://codecov.io/gh/php-forge/support/graph/badge.svg?token=Upc4yA23YN)](https://codecov.io/gh/php-forge/support)
-[![phpstan-level](https://img.shields.io/badge/PHPStan%20level-max-blue)](https://github.com/php-forge/support/actions/workflows/static.yml)
-[![StyleCI](https://github.styleci.io/repos/661073468/shield?branch=main)](https://github.styleci.io/repos/661073468?branch=main)
+[![Codecov](https://img.shields.io/codecov/c/github/php-forge/support.svg?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/php-forge/support)
+[![PHPStan Level Max](https://img.shields.io/badge/PHPStan-Level%20Max-4F5D95.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/php-forge/support/actions/workflows/static.yml)
+[![Super-Linter](https://img.shields.io/github/actions/workflow/status/php-forge/support/linter.yml?style=for-the-badge&label=Super-Linter&logo=github)](https://github.com/php-forge/support/actions/workflows/linter.yml)
+[![StyleCI](https://img.shields.io/badge/StyleCI-Passed-44CC11.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.styleci.io/repos/779611775?branch=main)
 
 ## Our social networks
 
-[![X](https://img.shields.io/badge/follow-@terabytesoftw-1DA1F2?logo=x&logoColor=1DA1F2&labelColor=555555&style=flat)](https://x.com/Terabytesoftw)
+[![Follow on X](https://img.shields.io/badge/-Follow%20on%20X-1DA1F2.svg?style=for-the-badge&logo=x&logoColor=white&labelColor=000000)](https://x.com/Terabytesoftw)
 
 ## License
 
-[![License](https://img.shields.io/github/license/php-forge/support?cacheSeconds=0)](LICENSE.md)
+[![License](https://img.shields.io/badge/License-BSD--3--Clause-brightgreen.svg?style=for-the-badge&logo=opensourceinitiative&logoColor=white&labelColor=555555)](LICENSE)
