@@ -20,14 +20,13 @@ use function str_replace;
 use function unlink;
 
 /**
- * Trait providing utilities for testing inaccessible properties, methods, and filesystem cleanup.
+ * Test support utilities for PHPUnit suites.
  *
- * Supplies static helper methods for normalizing line endings, accessing or modifying private/protected properties and
- * methods (including those inherited from parent classes), invoking inaccessible methods, and recursively removing
- * files from directories.
+ * Provides reflection-based helpers to read and write non-public properties and invoke non-public methods, including
+ * members declared on parent classes.
  *
- * These utilities are designed to facilitate comprehensive unit testing by enabling assertions and manipulations that
- * would otherwise be restricted by visibility constraints or platform differences.
+ * Also provides helpers for normalizing line endings to `"\n"` and for removing files from directories while
+ * preserving `.gitignore` and `.gitkeep`.
  *
  * @copyright Copyright (C) 2025 Terabytesoftw.
  * @license https://opensource.org/license/bsd-3-clause BSD 3-Clause License.
@@ -35,25 +34,21 @@ use function unlink;
 trait TestSupport
 {
     /**
-     * Retrieves the value of an inaccessible property from a parent class instance.
+     * Retrieves a property value from a specified class context.
      *
-     * Uses reflection to access the specified property of the given parent class, allowing tests to inspect or assert
-     * the value of private or protected properties inherited from parent classes.
-     *
-     * This method is useful for verifying the internal state of objects in inheritance scenarios where direct access
-     * to parent properties is not possible.
+     * Uses reflection to read `$propertyName` from `$object` using `$className` as the declaring class context.
      *
      * @param object $object Object instance from which to retrieve the property value.
-     * @param object|string $className Name or instance of the parent class containing the property.
+     * @param object|string $className Name or instance of the class that declares the property.
      * @param string $propertyName Name of the property to access.
      *
      * @throws ReflectionException
      *
-     * @return mixed Value of the specified parent property.
+     * @return mixed Value of the specified property.
      *
      * @phpstan-param class-string|object $className
      */
-    public static function inaccessibleParentProperty(
+    private static function inaccessibleParentProperty(
         object $object,
         string|object $className,
         string $propertyName,
@@ -64,24 +59,20 @@ trait TestSupport
     }
 
     /**
-     * Retrieves the value of an inaccessible property from an object or class instance.
+     * Retrieves a property value from a class or object.
      *
-     * Uses reflection to access the specified property of the given object or class, allowing tests to inspect or
-     * assert the value of private or protected properties that are otherwise inaccessible.
-     *
-     * This method is useful for verifying the internal state of objects during testing, especially when direct access
-     * to the property is not possible due to visibility constraints.
+     * Uses reflection to read `$propertyName` from the provided class name or object instance.
      *
      * @param object|string $object Name of the class or object instance from which to retrieve the property value.
      * @param string $propertyName Name of the property to access.
      *
-     * @throws ReflectionException if the property does not exist or is inaccessible.
+     * @throws ReflectionException if the property does not exist.
      *
-     * @return mixed Value of the specified property, or `null` if the property name is empty.
+     * @return mixed Value of the specified property, or `null` when `$propertyName` is empty.
      *
      * @phpstan-param class-string|object $object
      */
-    public static function inaccessibleProperty(string|object $object, string $propertyName): mixed
+    private static function inaccessibleProperty(string|object $object, string $propertyName): mixed
     {
         $class = new ReflectionClass($object);
 
@@ -94,24 +85,21 @@ trait TestSupport
     }
 
     /**
-     * Invokes an inaccessible method on the given object instance with the specified arguments.
+     * Invokes a method via reflection.
      *
-     * Uses reflection to access and invoke a private or protected method of the provided object, allowing tests to
-     * execute logic that is not publicly accessible.
-     *
-     * This is useful for verifying internal behavior or side effects during unit testing.
+     * Uses reflection to invoke `$method` on `$object` with `$args`.
      *
      * @param object $object Object instance containing the method to invoke.
      * @param string $method Name of the method to invoke.
      * @param array $args Arguments to pass to the method invocation.
      *
-     * @throws ReflectionException if the method does not exist or is inaccessible.
+     * @throws ReflectionException if the method does not exist.
      *
-     * @return mixed Value of the invoked method, or `null` if the method name is empty.
+     * @return mixed Value of the invoked method, or `null` when `$method` is empty.
      *
      * @phpstan-param array<array-key, mixed> $args
      */
-    public static function invokeMethod(object $object, string $method, array $args = []): mixed
+    private static function invokeMethod(object $object, string $method, array $args = []): mixed
     {
         $reflection = new ReflectionObject($object);
 
@@ -124,26 +112,23 @@ trait TestSupport
     }
 
     /**
-     * Invokes an inaccessible method from a parent class on the given object instance with the specified arguments.
+     * Invokes a parent class method via reflection.
      *
-     * Uses reflection to access and invoke a private or protected method defined in the specified parent class,
-     * allowing tests to execute logic that is not publicly accessible from the child class.
-     *
-     * This is useful for verifying inherited behavior or side effects during unit testing of subclasses.
+     * Uses `$parentClass` as the declaring class context to invoke `$method` on `$object` with `$args`.
      *
      * @param object $object Object instance containing the method to invoke.
      * @param string $parentClass Name of the parent class containing the method.
      * @param string $method Name of the method to invoke.
      * @param array $args Arguments to pass to the method invocation.
      *
-     * @throws ReflectionException if the method does not exist or is inaccessible in the parent class.
+     * @throws ReflectionException if the method does not exist.
      *
-     * @return mixed Value of the invoked method, or `null` if the method name is empty.
+     * @return mixed Value of the invoked method, or `null` when `$method` is empty.
      *
      * @phpstan-param class-string $parentClass
      * @phpstan-param array<array-key, mixed> $args
      */
-    public static function invokeParentMethod(
+    private static function invokeParentMethod(
         object $object,
         string $parentClass,
         string $method,
@@ -160,36 +145,32 @@ trait TestSupport
     }
 
     /**
-     * Normalizes line endings to Unix style ('\n') for cross-platform string assertions.
+     * Normalizes line endings to `"\n"` for cross-platform string assertions.
      *
-     * Converts Windows style ('\r\n') line endings to Unix style ('\n') to ensure consistent string comparisons across
-     * different operating systems during testing.
-     *
-     * This method is useful for eliminating false negatives in assertions caused by platform-specific line endings.
+     * Converts `"\r\n"` and `"\r"` to `"\n"` to keep string comparisons deterministic across operating systems.
      *
      * @param string $line Input string potentially containing Windows style line endings.
      *
-     * @return string String with normalized Unix style line endings.
+     * @return string String with normalized line endings.
      */
-    public static function normalizeLineEndings(string $line): string
+    private static function normalizeLineEndings(string $line): string
     {
         return str_replace(["\r\n", "\r"], "\n", $line);
     }
 
     /**
-     * Removes all files and directories recursively from the specified base path, excluding '.gitignore' and
-     * '.gitkeep'.
+     * Removes directory contents recursively while preserving `.gitignore` and `.gitkeep`.
      *
-     * Opens the given directory, iterates through its contents, and removes all files and subdirectories except for
-     * special entries ('.', '..', '.gitignore', '.gitkeep').
+     * Iterates through `$basePath` and removes all files and subdirectories except `.`, `..`, `.gitignore`, and
+     * `.gitkeep`. Subdirectories are processed recursively before removal.
      *
-     * Subdirectories are processed recursively before removal.
+     * File and directory removals are attempted with error suppression.
      *
      * @param string $basePath Absolute path to the directory whose contents will be removed.
      *
      * @throws RuntimeException if the directory cannot be opened for reading.
      */
-    public static function removeFilesFromDirectory(string $basePath): void
+    private static function removeFilesFromDirectory(string $basePath): void
     {
         $handle = @opendir($basePath);
 
@@ -199,7 +180,11 @@ trait TestSupport
         }
 
         while (($file = readdir($handle)) !== false) {
-            if ($file === '.' || $file === '..' || $file === '.gitignore' || $file === '.gitkeep') {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            if ($file === '.gitignore' || $file === '.gitkeep') {
                 continue;
             }
 
@@ -217,24 +202,22 @@ trait TestSupport
     }
 
     /**
-     * Sets the value of an inaccessible property on a parent class instance.
+     * Sets a parent class property value via reflection.
      *
-     * Uses reflection to assign the specified value to a private or protected property defined in the given parent
-     * class, enabling tests to modify internal state that is otherwise inaccessible due to visibility constraints in
-     * inheritance scenarios.
+     * Uses `$parentClass` as the declaring class context to assign `$value` to `$propertyName` on `$object`.
      *
-     * This method is useful for testing scenarios that require direct manipulation of parent class internals.
+     * This method is a no-op when `$propertyName` is empty.
      *
      * @param object $object Object instance whose parent property will be set.
      * @param string $parentClass Name of the parent class containing the property.
      * @param string $propertyName Name of the property to set.
      * @param mixed $value Value to assign to the property.
      *
-     * @throws ReflectionException if the property does not exist or is inaccessible in the parent class.
+     * @throws ReflectionException if the property does not exist.
      *
      * @phpstan-param class-string $parentClass
      */
-    public static function setInaccessibleParentProperty(
+    private static function setInaccessibleParentProperty(
         object $object,
         string $parentClass,
         string $propertyName,
@@ -251,20 +234,19 @@ trait TestSupport
     }
 
     /**
-     * Sets the value of an inaccessible property on the given object instance.
+     * Sets a property value via reflection.
      *
-     * Uses reflection to assign the specified value to a private or protected property of the provided object enabling
-     * tests to modify internal state that is otherwise inaccessible due to visibility constraints.
+     * Assigns `$value` to `$propertyName` on `$object`.
      *
-     * This method is useful for testing scenarios that require direct manipulation of object internals.
+     * This method is a no-op when `$propertyName` is empty.
      *
      * @param object $object Object instance whose property will be set.
      * @param string $propertyName Name of the property to set.
      * @param mixed $value Value to assign to the property.
      *
-     * @throws ReflectionException if the property does not exist or is inaccessible.
+     * @throws ReflectionException if the property does not exist.
      */
-    public static function setInaccessibleProperty(
+    private static function setInaccessibleProperty(
         object $object,
         string $propertyName,
         mixed $value,

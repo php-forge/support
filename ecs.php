@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-use PhpCsFixer\Fixer\ClassNotation\ClassDefinitionFixer;
-use PhpCsFixer\Fixer\ClassNotation\OrderedClassElementsFixer;
-use PhpCsFixer\Fixer\ClassNotation\OrderedTraitsFixer;
-use PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer;
-use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
-use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
+use PhpCsFixer\Fixer\ClassNotation\{ClassDefinitionFixer, OrderedClassElementsFixer, OrderedTraitsFixer};
+use PhpCsFixer\Fixer\Import\{NoUnusedImportsFixer, OrderedImportsFixer};
+use PhpCsFixer\Fixer\Phpdoc\PhpdocTypesOrderFixer;
 use PhpCsFixer\Fixer\StringNotation\SingleQuoteFixer;
+use PhpCsFixer\Fixer\LanguageConstruct\NullableTypeDeclarationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return ECSConfig::configure()
@@ -33,7 +31,7 @@ return ECSConfig::configure()
                 'construct',
                 'destruct',
                 'magic',
-                'phpunit',
+                'method_protected_abstract',
                 'method_public',
                 'method_protected',
                 'method_private',
@@ -44,14 +42,19 @@ return ECSConfig::configure()
     ->withConfiguredRule(
         OrderedImportsFixer::class,
         [
-            'imports_order' => ['class', 'function', 'const'],
+            'imports_order' => [
+                'class',
+                'function',
+                'const',
+            ],
             'sort_algorithm' => 'alpha',
         ],
     )
     ->withConfiguredRule(
-        VisibilityRequiredFixer::class,
+        PhpdocTypesOrderFixer::class,
         [
-            'elements' => [],
+            'sort_algorithm' => 'none',
+            'null_adjustment' => 'always_last',
         ],
     )
     ->withFileExtensions(['php'])
@@ -61,7 +64,7 @@ return ECSConfig::configure()
             __DIR__ . '/tests',
         ],
     )
-    ->withPhpCsFixerSets(perCS20: true)
+    ->withPhpCsFixerSets(perCS30: true)
     ->withPreparedSets(
         cleanCode: true,
         comments: true,
@@ -74,5 +77,10 @@ return ECSConfig::configure()
             NoUnusedImportsFixer::class,
             OrderedTraitsFixer::class,
             SingleQuoteFixer::class,
+        ]
+    )
+    ->withSkip(
+        [
+            NullableTypeDeclarationFixer::class,
         ]
     );

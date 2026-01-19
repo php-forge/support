@@ -50,32 +50,58 @@ final class TestSupportTest extends TestCase
         );
     }
 
+    public function testNormalizeLineEndingsReturnsUnchangedStringWhenNoNormalizationNeeded(): void
+    {
+        self::assertSame(
+            "foo\nbar",
+            self::normalizeLineEndings("foo\nbar"),
+            'Should return the original string when no normalization is required.',
+        );
+    }
+
     public function testNormalizeLineEndingsWhenStringsAreIdenticalWithLineEndings(): void
     {
         self::assertSame(
+            "foo\nbar",
             self::normalizeLineEndings("foo\r\nbar"),
-            self::normalizeLineEndings("foo\nbar"),
-            "Should produce the same normalized string for 'CRLF' and 'LF' inputs.",
+            "Should normalize 'CRLF' inputs to 'LF'.",
         );
     }
 
     public function testRemoveFilesFromDirectoryRemovesAllFiles(): void
     {
-        $dir = dirname(__DIR__) . '/runtime';
+        $dir = __DIR__ . '/Support/runtime';
 
+        if (is_dir($dir)) {
+            unlink("{$dir}/.gitignore");
+            unlink("{$dir}/.gitkeep");
+            rmdir($dir);
+        }
+
+        mkdir($dir, 0777, true);
         mkdir("{$dir}/subdir");
         touch("{$dir}/test.txt");
         touch("{$dir}/subdir/test.txt");
+        touch("{$dir}/.gitignore");
+        touch("{$dir}/.gitkeep");
 
         self::removeFilesFromDirectory($dir);
 
-        $this->assertFileDoesNotExist(
+        self::assertFileDoesNotExist(
             "{$dir}/test.txt",
             "File 'test.txt' should not exist after 'removeFilesFromDirectory' method is called.",
         );
-        $this->assertFileDoesNotExist(
+        self::assertFileDoesNotExist(
             "{$dir}/subdir/test.txt",
             "File 'subdir/test.txt' should not exist after 'removeFilesFromDirectory' method is called.",
+        );
+        self::assertFileExists(
+            "{$dir}/.gitignore",
+            "File '.gitignore' should remain after 'removeFilesFromDirectory' method is called.",
+        );
+        self::assertFileExists(
+            "{$dir}/.gitkeep",
+            "File '.gitkeep' should remain after 'removeFilesFromDirectory' method is called.",
         );
     }
 
@@ -96,11 +122,11 @@ final class TestSupportTest extends TestCase
      */
     public function testReturnValueWhenInvokingInaccessibleMethod(): void
     {
-        $this->assertSame(
+        self::assertSame(
             'value',
             self::invokeMethod(new TestClass(), 'inaccessibleMethod'),
-            "Should return 'value' when invoking the inaccessible method 'inaccessibleParentMethod' on 'TestClass' " .
-            'via reflection.',
+            "Should return 'value' when invoking the inaccessible method 'inaccessibleParentMethod' on 'TestClass' "
+            . 'via reflection.',
         );
     }
 
@@ -109,15 +135,15 @@ final class TestSupportTest extends TestCase
      */
     public function testReturnValueWhenInvokingInaccessibleParentMethod(): void
     {
-        $this->assertSame(
+        self::assertSame(
             'valueParent',
             self::invokeParentMethod(
                 new TestClass(),
                 TestBaseClass::class,
                 'inaccessibleParentMethod',
             ),
-            "Should return 'valueParent' when invoking the inaccessible parent method 'inaccessibleParentMethod' on " .
-            "'TestClass' via reflection.",
+            "Should return 'valueParent' when invoking the inaccessible parent method 'inaccessibleParentMethod' on "
+            . "'TestClass' via reflection.",
         );
     }
 
@@ -130,11 +156,11 @@ final class TestSupportTest extends TestCase
 
         self::setInaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent', 'foo');
 
-        $this->assertSame(
+        self::assertSame(
             'foo',
             self::inaccessibleParentProperty($object, TestBaseClass::class, 'propertyParent'),
-            "Should return 'foo' after setting the parent property 'propertyParent' via " .
-            "'setInaccessibleParentProperty' method.",
+            "Should return 'foo' after setting the parent property 'propertyParent' via "
+            . "'setInaccessibleParentProperty' method.",
         );
     }
 
@@ -147,7 +173,7 @@ final class TestSupportTest extends TestCase
 
         self::setInaccessibleProperty($object, 'property', 'foo');
 
-        $this->assertSame(
+        self::assertSame(
             'foo',
             self::inaccessibleProperty($object, 'property'),
             "Should return 'foo' after setting the private property 'property' via 'setInaccessibleProperty' method.",
