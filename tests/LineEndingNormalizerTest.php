@@ -32,6 +32,7 @@ final class LineEndingNormalizerTest extends TestCase
             "Should normalize literal '\\n' sequences to 'LF'.",
         );
     }
+
     public function testNormalizeReturnsUnchangedStringWhenNoNormalizationNeeded(): void
     {
         self::assertSame(
