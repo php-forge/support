@@ -41,11 +41,9 @@ enum Message: string
     /**
      * Returns the formatted message string for the error case.
      *
-     * Retrieves and formats the error message string by interpolating the provided arguments.
+     * @param int|string ...$argument Values to insert into the message template.
      *
-     * @param int|string ...$argument Dynamic arguments to insert into the message.
-     *
-     * @return string Error message with interpolated arguments.
+     * @return string Formatted error message with interpolated arguments.
      *
      * Usage example:
      * ```php
