@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PHPForge\Support\Tests\Stub;
 
 /**
- * Backed enum stub for tests.
+ * Stub for a nacked enum.
  *
  * Provides deterministic integer-backed values required by the test suite.
  *
