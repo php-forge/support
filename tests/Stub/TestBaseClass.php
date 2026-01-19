@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PHPForge\Support\Tests\Stub;
 
 /**
- * Stub for a abstract base class providing a protected method and private property for testing inheritance scenarios.
+ * Stub for an abstract base class providing a protected method and private property for testing inheritance scenarios.
  *
  * Serves as a parent class in test stubs to verify property visibility and method accessibility in child classes.
  *
