@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace PHPForge\Support\Tests\Stub;
 
 /**
- * Test enum for {@see \PHPForge\Support\EnumDataProvider} dataset generation.
+ * Backed enum stub for tests.
+ *
+ * Provides deterministic backed values required by the test suite.
  *
  * @copyright Copyright (C) 2026 Terabytesoftw.
  * @license https://opensource.org/license/bsd-3-clause BSD 3-Clause License.
  */
-enum TestEnum
+enum TestBackedEnum: string
 {
-    case BAR;
-
-    case FOO;
+    case Bar = 'bar';
+    case Foo = 'foo';
 }

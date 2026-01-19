@@ -7,32 +7,30 @@ namespace PHPForge\Support;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
-use RuntimeException;
 
-use function basename;
-use function closedir;
-use function is_dir;
 use function is_string;
-use function opendir;
-use function readdir;
-use function rmdir;
-use function str_replace;
-use function unlink;
 
 /**
- * Test support utilities for PHPUnit suites.
+ * Reflection-based utilities for PHPUnit tests.
  *
- * Provides reflection-based helpers to read and write non-public properties and invoke non-public methods, including
- * members declared on parent classes.
+ * Provides helper methods to read and write non-public properties and invoke non-public methods, including members
+ * declared on parent classes.
  *
- * Also provides helpers for normalizing line endings to `"\n"` and for removing files from directories while
- * preserving `.gitignore` and `.gitkeep`.
+ * Key features.
+ * - Invokes non-public methods via {@see ReflectionHelper::invokeMethod()} and
+ *   {@see ReflectionHelper::invokeParentMethod()}.
+ * - Reads non-public properties via {@see ReflectionHelper::inaccessibleProperty()} and
+ *   {@see ReflectionHelper::inaccessibleParentProperty()}.
+ * - Sets non-public properties via {@see ReflectionHelper::setInaccessibleProperty()} and
+ *   {@see ReflectionHelper::setInaccessibleParentProperty()}.
  *
- * @copyright Copyright (C) 2025 Terabytesoftw.
+ * @copyright Copyright (C) 2026 Terabytesoftw.
  * @license https://opensource.org/license/bsd-3-clause BSD 3-Clause License.
  */
-trait TestSupport
+final class ReflectionHelper
 {
+    private function __construct() {}
+
     /**
      * Retrieves a property value from a specified class context.
      *
@@ -48,7 +46,7 @@ trait TestSupport
      *
      * @phpstan-param class-string|object $className
      */
-    private static function inaccessibleParentProperty(
+    public static function inaccessibleParentProperty(
         object $object,
         string|object $className,
         string $propertyName,
@@ -72,7 +70,7 @@ trait TestSupport
      *
      * @phpstan-param class-string|object $object
      */
-    private static function inaccessibleProperty(string|object $object, string $propertyName): mixed
+    public static function inaccessibleProperty(string|object $object, string $propertyName): mixed
     {
         $class = new ReflectionClass($object);
 
@@ -99,7 +97,7 @@ trait TestSupport
      *
      * @phpstan-param array<array-key, mixed> $args
      */
-    private static function invokeMethod(object $object, string $method, array $args = []): mixed
+    public static function invokeMethod(object $object, string $method, array $args = []): mixed
     {
         $reflection = new ReflectionObject($object);
 
@@ -128,7 +126,7 @@ trait TestSupport
      * @phpstan-param class-string $parentClass
      * @phpstan-param array<array-key, mixed> $args
      */
-    private static function invokeParentMethod(
+    public static function invokeParentMethod(
         object $object,
         string $parentClass,
         string $method,
@@ -142,63 +140,6 @@ trait TestSupport
         }
 
         return $result ?? null;
-    }
-
-    /**
-     * Normalizes line endings to `"\n"` for cross-platform string assertions.
-     *
-     * Converts `"\r\n"` and `"\r"` to `"\n"` to keep string comparisons deterministic across operating systems.
-     *
-     * @param string $line Input string potentially containing Windows style line endings.
-     *
-     * @return string String with normalized line endings.
-     */
-    private static function normalizeLineEndings(string $line): string
-    {
-        return str_replace(["\r\n", "\r"], "\n", $line);
-    }
-
-    /**
-     * Removes directory contents recursively while preserving `.gitignore` and `.gitkeep`.
-     *
-     * Iterates through `$basePath` and removes all files and subdirectories except `.`, `..`, `.gitignore`, and
-     * `.gitkeep`. Subdirectories are processed recursively before removal.
-     *
-     * File and directory removals are attempted with error suppression.
-     *
-     * @param string $basePath Absolute path to the directory whose contents will be removed.
-     *
-     * @throws RuntimeException if the directory cannot be opened for reading.
-     */
-    private static function removeFilesFromDirectory(string $basePath): void
-    {
-        $handle = @opendir($basePath);
-
-        if ($handle === false) {
-            $dirname = basename($basePath);
-            throw new RuntimeException("Unable to open directory: $dirname");
-        }
-
-        while (($file = readdir($handle)) !== false) {
-            if ($file === '.' || $file === '..') {
-                continue;
-            }
-
-            if ($file === '.gitignore' || $file === '.gitkeep') {
-                continue;
-            }
-
-            $path = $basePath . DIRECTORY_SEPARATOR . $file;
-
-            if (is_dir($path)) {
-                self::removeFilesFromDirectory($path);
-                @rmdir($path);
-            } else {
-                @unlink($path);
-            }
-        }
-
-        closedir($handle);
     }
 
     /**
@@ -217,7 +158,7 @@ trait TestSupport
      *
      * @phpstan-param class-string $parentClass
      */
-    private static function setInaccessibleParentProperty(
+    public static function setInaccessibleParentProperty(
         object $object,
         string $parentClass,
         string $propertyName,
@@ -246,7 +187,7 @@ trait TestSupport
      *
      * @throws ReflectionException if the property does not exist.
      */
-    private static function setInaccessibleProperty(
+    public static function setInaccessibleProperty(
         object $object,
         string $propertyName,
         mixed $value,

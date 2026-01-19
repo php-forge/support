@@ -40,7 +40,7 @@ composer require php-forge/support:^0.2 --dev
 
 ### Quick start
 
-This package provides the `PHPForge\Support\TestSupport` trait for PHPUnit tests.
+This package provides helper classes for PHPUnit tests.
 
 It supports reflection-based access to non-public members, deterministic string comparisons across platforms, and filesystem cleanup for isolated test environments.
 
@@ -51,12 +51,11 @@ It supports reflection-based access to non-public members, deterministic string 
 
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class AccessPrivatePropertyTest extends TestCase
 {
-    use TestSupport;
 
     public function testInaccessibleProperty(): void
     {
@@ -64,7 +63,7 @@ final class AccessPrivatePropertyTest extends TestCase
             private string $secretValue = 'hidden';
         };
 
-        $value = self::inaccessibleProperty($object, 'secretValue');
+        $value = ReflectionHelper::inaccessibleProperty($object, 'secretValue');
 
         self::assertSame('hidden', $value);
     }
@@ -78,12 +77,11 @@ final class AccessPrivatePropertyTest extends TestCase
 
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class InvokeProtectedMethodTest extends TestCase
 {
-    use TestSupport;
 
     public function testInvokeMethod(): void
     {
@@ -94,7 +92,7 @@ final class InvokeProtectedMethodTest extends TestCase
             }
         };
 
-        $result = self::invokeMethod($object, 'calculate', [5, 3]);
+        $result = ReflectionHelper::invokeMethod($object, 'calculate', [5, 3]);
 
         self::assertSame(8, $result);
     }
@@ -108,18 +106,17 @@ final class InvokeProtectedMethodTest extends TestCase
 
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\LineEndingNormalizer;
 use PHPUnit\Framework\TestCase;
 
 final class NormalizeLineEndingsTest extends TestCase
 {
-    use TestSupport;
 
     public function testNormalizedComparison(): void
     {
         self::assertSame(
-            self::normalizeLineEndings("Foo\r\nBar"),
-            self::normalizeLineEndings("Foo\nBar"),
+            LineEndingNormalizer::normalize("Foo\r\nBar"),
+            LineEndingNormalizer::normalize("Foo\nBar"),
         );
     }
 }
@@ -132,12 +129,11 @@ final class NormalizeLineEndingsTest extends TestCase
 
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\DirectoryCleaner;
 use PHPUnit\Framework\TestCase;
 
 final class RemoveFilesFromDirectoryTest extends TestCase
 {
-    use TestSupport;
 
     public function testCleanup(): void
     {
@@ -148,7 +144,7 @@ final class RemoveFilesFromDirectoryTest extends TestCase
             file_put_contents($testDir . '/artifact.txt', 'test');
             file_put_contents($testDir . '/.gitignore', "*\n");
 
-            self::removeFilesFromDirectory($testDir);
+            DirectoryCleaner::clean($testDir);
 
             self::assertFileDoesNotExist($testDir . '/artifact.txt');
             self::assertFileExists($testDir . '/.gitignore');
@@ -167,12 +163,11 @@ final class RemoveFilesFromDirectoryTest extends TestCase
 
 declare(strict_types=1);
 
-use PHPForge\Support\TestSupport;
+use PHPForge\Support\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class SetInaccessiblePropertyTest extends TestCase
 {
-    use TestSupport;
 
     public function testSetProperty(): void
     {
@@ -180,18 +175,18 @@ final class SetInaccessiblePropertyTest extends TestCase
             private string $config = 'default';
         };
 
-        self::setInaccessibleProperty($object, 'config', 'test-mode');
+        ReflectionHelper::setInaccessibleProperty($object, 'config', 'test-mode');
 
-        $newValue = self::inaccessibleProperty($object, 'config');
+        $newValue = ReflectionHelper::inaccessibleProperty($object, 'config');
 
         self::assertSame('test-mode', $newValue);
     }
 }
 ```
 
-#### Enum data generator
+#### Enum data provider
 
-Use `PHPForge\Support\EnumDataGenerator` to build deterministic datasets from `UnitEnum::cases()` and `UIAwesome\Html\Helper\Enum::normalizeValue()`.
+Use `PHPForge\Support\EnumDataProvider` to build deterministic datasets from `UnitEnum::cases()` and normalized enum values.
 
 ##### Attribute fragment output (HTML)
 
@@ -202,10 +197,9 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use PHPForge\Support\EnumDataGenerator;
+use PHPForge\Support\EnumDataProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use UIAwesome\Html\Helper\Enum;
 use UnitEnum;
 
 enum Size
@@ -214,17 +208,17 @@ enum Size
     case Large;
 }
 
-final class EnumDataGeneratorHtmlTest extends TestCase
+final class EnumDataProviderHtmlTest extends TestCase
 {
     public static function provideEnumAttributes(): array
     {
-        return EnumDataGenerator::cases(Size::class, 'data-size', true);
+        return EnumDataProvider::attributeCases(Size::class, 'data-size', true);
     }
 
     #[DataProvider('provideEnumAttributes')]
     public function testBuildsAttributeFragment(UnitEnum $case, array $args, string $expected, string $message): void
     {
-        $normalized = (string) Enum::normalizeValue($case);
+        $normalized = $case->name;
         $attributeFragment = " data-size=\"{$normalized}\"";
 
         self::assertSame($expected, $attributeFragment, $message);
@@ -241,7 +235,7 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use PHPForge\Support\EnumDataGenerator;
+use PHPForge\Support\EnumDataProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use UnitEnum;
@@ -252,11 +246,11 @@ enum State
     case Disabled;
 }
 
-final class EnumDataGeneratorEnumTest extends TestCase
+final class EnumDataProviderEnumTest extends TestCase
 {
     public static function provideEnumInstances(): array
     {
-        return EnumDataGenerator::cases(State::class, 'state', false);
+        return EnumDataProvider::attributeCases(State::class, 'state', false);
     }
 
     #[DataProvider('provideEnumInstances')]
@@ -276,10 +270,9 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use PHPForge\Support\EnumDataGenerator;
+use PHPForge\Support\EnumDataProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use UIAwesome\Html\Helper\Enum;
 
 enum Heading
 {
@@ -287,17 +280,17 @@ enum Heading
     case H2;
 }
 
-final class EnumDataGeneratorTagCasesTest extends TestCase
+final class EnumDataProviderTagCasesTest extends TestCase
 {
     public static function provideTags(): array
     {
-        return EnumDataGenerator::tagCases(Heading::class, 'heading');
+        return EnumDataProvider::tagCases(Heading::class, 'heading');
     }
 
     #[DataProvider('provideTags')]
     public function testProvidesNormalizedTag(Heading $case, string $normalized): void
     {
-        self::assertSame((string) Enum::normalizeValue($case), $normalized);
+        self::assertSame($case->name, $normalized);
     }
 }
 ```

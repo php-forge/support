@@ -55,7 +55,7 @@
                 </div>
                 <div class="alert-box">
                     <p class="alert-title"><strong>Enum dataset generation</strong></p>
-                    <p class="alert-content">Generate deterministic datasets for enum-based attribute test cases via <code>EnumDataGenerator</code>.</p>
+                    <p class="alert-content">Generate deterministic datasets for enum-based attribute test cases via <code>EnumDataProvider</code>.</p>
                 </div>
                 <div class="alert-box">
                     <p class="alert-title"><strong>Filesystem test management</strong></p>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="alert-box">
                     <p class="alert-title"><strong>PHPUnit-focused helpers</strong></p>
-                    <p class="alert-content">Use the <code>TestSupport</code> trait to share test utilities across the suite.</p>
+                    <p class="alert-content">Use helper classes to share test utilities across the suite.</p>
                 </div>
             </div>
         </div>
