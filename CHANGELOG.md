@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 0.3.1 Under development
+## 0.3.1 January 20, 2026
 
 - Bug #14: Update descriptions in stub classes to clarify purpose (@terabytesoftw)
 - Bug #15: Clarify parameter descriptions in `Message::getMessage()` method in `Message` enum (@terabytesoftw)
