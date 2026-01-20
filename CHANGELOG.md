@@ -1,5 +1,7 @@
 # ChangeLog
 
+## 0.3.2 Under development
+
 ## 0.3.1 January 20, 2026
 
 - Bug #14: Update descriptions in stub classes to clarify purpose (@terabytesoftw)
