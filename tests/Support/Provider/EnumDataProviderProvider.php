@@ -28,7 +28,7 @@ final class EnumDataProviderProvider
                 false,
                 'enum: FOO',
                 ' data-test="FOO"',
-                'Should return the enum instance for case: FOO.',
+                "Should return the 'data-test' attribute value for enum case: FOO.",
             ],
             'as html' => [
                 TestEnum::class,
