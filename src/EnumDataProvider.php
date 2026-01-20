@@ -7,6 +7,7 @@ namespace PHPForge\Support;
 use BackedEnum;
 use UnitEnum;
 
+use function is_string;
 use function sprintf;
 
 /**
@@ -26,39 +27,31 @@ final class EnumDataProvider
     /**
      * Generates test cases for enum-based attribute scenarios.
      *
-     * Normalizes each enum case and produces an expected value as either an attribute fragment (when `$asHtml` is
-     * `true`) or the enum case instance (when `$asHtml` is `false`).
-     *
-     * @phpstan-param class-string<UnitEnum> $enumClass Enum class name implementing UnitEnum.
+     * Normalizes each enum case and produces an expected value as either an attribute fragment.
      *
      * @param string $enumClass Enum class name implementing UnitEnum.
      * @param string|UnitEnum $attribute Attribute name used to build the expected fragment.
-     * @param bool $asHtml Whether to generate expected output as an attribute fragment or enum instance. Default is
-     * `true`.
      *
      * @return array Structured test cases indexed by a normalized enum value key.
      *
-     * @phpstan-return array<string, array{UnitEnum, mixed[], string|UnitEnum, string}>
+     * @phpstan-param class-string<UnitEnum> $enumClass Enum class name implementing UnitEnum.
+     * @phpstan-return array<string, array{UnitEnum, mixed[], UnitEnum, string, string}>
      */
-    public static function attributeCases(string $enumClass, string|UnitEnum $attribute, bool $asHtml = true): array
+    public static function attributeCases(string $enumClass, string|UnitEnum $attribute): array
     {
+        $attribute = self::normalizeValue($attribute);
         $cases = [];
-        $attributeName = is_string($attribute) ? $attribute : sprintf('%s', self::normalizeValue($attribute));
 
         foreach ($enumClass::cases() as $case) {
             $normalizedValue = self::normalizeValue($case);
-
             $key = "enum: {$normalizedValue}";
-            $expected = $asHtml ? " {$attributeName}=\"{$normalizedValue}\"" : $case;
-            $message = $asHtml
-                ? "Should return the '{$attributeName}' attribute value for enum case: {$normalizedValue}."
-                : "Should return the enum instance for case: {$normalizedValue}.";
 
             $cases[$key] = [
                 $case,
                 [],
-                $expected,
-                $message,
+                $case,
+                " {$attribute}=\"{$normalizedValue}\"",
+                "Should return the '{$attribute}' attribute value for enum case: {$normalizedValue}.",
             ];
         }
 
@@ -90,8 +83,19 @@ final class EnumDataProvider
         return $data;
     }
 
-    private static function normalizeValue(UnitEnum $enum): string
+    /**
+     * Normalizes the enum value to a string representation.
+     *
+     * @param string|UnitEnum $enum Enum instance or string value.
+     *
+     * @return string Normalized string value of the enum.
+     */
+    private static function normalizeValue(string|UnitEnum $enum): string
     {
+        if (is_string($enum)) {
+            return $enum;
+        }
+
         return match ($enum instanceof BackedEnum) {
             true => (string) $enum->value,
             false => $enum->name,

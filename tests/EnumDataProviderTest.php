@@ -42,10 +42,7 @@ final class EnumDataProviderTest extends TestCase
         string $expectedAttributeCase,
         string $expectedMessage,
     ): void {
-        $data = match ($asHtml) {
-            true => EnumDataProvider::attributeCases($enumClass, $attribute),
-            false => EnumDataProvider::attributeCases($enumClass, $attribute, false),
-        };
+        $data = EnumDataProvider::attributeCases($enumClass, $attribute);
 
         self::assertNotEmpty(
             $data,
@@ -65,14 +62,14 @@ final class EnumDataProviderTest extends TestCase
         if ($asHtml) {
             self::assertSame(
                 $expectedAttributeCase,
-                $data[$expectedKeyCase][2],
+                $data[$expectedKeyCase][3],
                 'Should return expected attribute value for enum case.',
             );
         }
 
         self::assertSame(
             $expectedMessage,
-            $data[$expectedKeyCase][3],
+            $data[$expectedKeyCase][4],
             'Should return expected message for enum case.',
         );
     }
