@@ -299,8 +299,8 @@ final class EnumDataProviderTagCasesTest extends TestCase
 
 For detailed configuration options and advanced usage.
 
-- [Testing Guide](docs/testing.md)
-- [Development Guide](docs/development.md)
+- 🧪 [Testing Guide](docs/testing.md)
+- 🛠️ [Development Guide](docs/development.md)
 
 ## Package information
 
