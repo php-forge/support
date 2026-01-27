@@ -3,7 +3,7 @@
 ## 0.3.2 Under development
 
 - Enh #22: Add `php-forge/coding-standard` to development dependencies for code quality checks (@terabytesoftw)
-- Bug #23:Update Rector command in `composer.json` to remove unnecessary 'src' argument (@terabytesoftw)
+- Bug #23: Update Rector command in `composer.json` to remove unnecessary 'src' argument (@terabytesoftw)
 
 ## 0.3.1 January 20, 2026
 
