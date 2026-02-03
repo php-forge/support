@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 0.3.2 Under development
+## 0.3.2 February 3, 2026
 
 - Enh #22: Add `php-forge/coding-standard` to development dependencies for code quality checks (@terabytesoftw)
 - Bug #23: Update Rector command in `composer.json` to remove unnecessary 'src' argument (@terabytesoftw)
