@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace PHPForge\Support\Tests\Support\Provider;
 
-use PHPForge\Support\Tests\Stub\TestEnum;
+use PHPForge\Support\Stub\{BackedInteger, BackedString, Unit};
+use UnitEnum;
 
 /**
  * Data provider for {@see \PHPForge\Support\Tests\EnumDataProviderTest} test cases.
@@ -17,34 +18,34 @@ use PHPForge\Support\Tests\Stub\TestEnum;
 final class EnumDataProviderProvider
 {
     /**
-     * @return array<string, array{string, string|\UnitEnum, bool, string, string, string}>
+     * @return array<string, array{string, string|UnitEnum, bool, string, string, string}>
      */
     public static function casesParameters(): array
     {
         return [
-            'as enum instance' => [
-                TestEnum::class,
+            'enum backed integer instance' => [
+                BackedInteger::class,
+                BackedInteger::VALUE,
+                true,
+                'enum: 1',
+                ' 1="1"',
+                "Should return the '1' attribute value for enum case: 1.",
+            ],
+            'enum backed string instance' => [
+                BackedString::class,
+                'data-test',
+                true,
+                'enum: value',
+                ' data-test="value"',
+                "Should return the 'data-test' attribute value for enum case: value.",
+            ],
+            'enum unit instance' => [
+                Unit::class,
                 'data-test',
                 false,
-                'enum: FOO',
-                ' data-test="FOO"',
-                "Should return the 'data-test' attribute value for enum case: FOO.",
-            ],
-            'as html' => [
-                TestEnum::class,
-                'data-test',
-                true,
-                'enum: BAR',
-                ' data-test="BAR"',
-                "Should return the 'data-test' attribute value for enum case: BAR.",
-            ],
-            'attribute as enum instance' => [
-                TestEnum::class,
-                TestEnum::FOO,
-                true,
-                'enum: FOO',
-                ' FOO="FOO"',
-                "Should return the 'FOO' attribute value for enum case: FOO.",
+                'enum: value',
+                ' data-test="value"',
+                "Should return the 'data-test' attribute value for enum case: value.",
             ],
         ];
     }

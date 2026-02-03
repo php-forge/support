@@ -29,8 +29,6 @@ use function is_string;
  */
 final class ReflectionHelper
 {
-    private function __construct() {}
-
     /**
      * Retrieves a property value from a specified class context.
      *
