@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PHPForge\Support\Tests;
 
 use PHPForge\Support\EnumDataProvider;
-use PHPForge\Support\Tests\Stub\TestEnum;
+use PHPForge\Support\Stub\BackedInteger;
 use PHPForge\Support\Tests\Support\Provider\EnumDataProviderProvider;
 use PHPUnit\Framework\Attributes\{DataProviderExternal, Group};
 use PHPUnit\Framework\TestCase;
@@ -76,7 +76,7 @@ final class EnumDataProviderTest extends TestCase
 
     public function testTagCasesGenerateExpectedStructure(): void
     {
-        $data = EnumDataProvider::tagCases(TestEnum::class, 'element');
+        $data = EnumDataProvider::tagCases(BackedInteger::class, 'element');
 
         self::assertNotEmpty(
             $data,
@@ -84,13 +84,9 @@ final class EnumDataProviderTest extends TestCase
         );
         self::assertSame(
             [
-                'BAR element tag' => [
-                    TestEnum::BAR,
-                    'BAR',
-                ],
-                'FOO element tag' => [
-                    TestEnum::FOO,
-                    'FOO',
+                '1 element tag' => [
+                    BackedInteger::VALUE,
+                    1 => '1',
                 ],
             ],
             $data,
