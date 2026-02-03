@@ -4,6 +4,7 @@
 
 - Enh #22: Add `php-forge/coding-standard` to development dependencies for code quality checks (@terabytesoftw)
 - Bug #23: Update Rector command in `composer.json` to remove unnecessary 'src' argument (@terabytesoftw)
+- Enh #24: Add enums for backed integer, backed string, and unit values in the `Stub` namespace (@terabytesoftw)
 
 ## 0.3.1 January 20, 2026
 
